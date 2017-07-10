@@ -48,7 +48,7 @@ import { Cell } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
-    this.$refs.list_frame.style.height = (document.documentElement.clientHeight - this.$refs.list_frame.getBoundingClientRect().top) + 'px'
+    this.resizeList()
   },
   components: {
     [Cell.name]: Cell
@@ -102,6 +102,12 @@ export default {
   methods: {
     toggleType () {
       this.pullDown = !this.pullDown
+      this.$nextTick(() => {
+        this.resizeList()
+      })
+    },
+    resizeList () {
+      this.$refs.list_frame.style.height = (document.documentElement.clientHeight - this.$refs.list_frame.getBoundingClientRect().top) + 'px'
     }
   }
 }
