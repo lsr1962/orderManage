@@ -5,9 +5,7 @@
       <div v-if="$route.meta.right" slot="right" @click="triggerRight">{{$route.meta.right}}</div>
     </mt-header>
     <transition name="merchant-slide" mode="out-in">
-      <div ref="trans">
-        <router-view></router-view>
-      </div>
+      <router-view></router-view>
     </transition>
   </div>
 </template>
@@ -20,8 +18,6 @@
         this.iosFixed = '20px'
         this.iosFixedHeight = '64px'
       }
-      this.$refs.trans.style.height = (document.documentElement.clientHeight - this.$refs.trans.getBoundingClientRect().top) + 'px'
-      this.$refs.trans.style.overflow = 'auto'
     },
     components: {
       [Header.name]: Header
