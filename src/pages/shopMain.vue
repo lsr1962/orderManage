@@ -259,9 +259,9 @@ export default {
     font-size: 16px;
     color: #FFFFFF;
     text-align: left;
-    background: -moz-linear-gradient(left, #A87C33  0%, #AA906E  50%, #A87C33 100%) !important;
-    background: -webkit-linear-gradient(left, #A87C33  0%, #AA906E  50%, #A87C33 100%) !important;
-    background: linear-gradient(to right, #A87C33 0%, #AA906E  50%, #A87C33 100%) !important;
+    background: -moz-linear-gradient(45deg, #A87C33  0%, #AA906E  30%, #A87C33 60%, #AA906E  100%) !important;
+    background: -webkit-linear-gradient(45deg, #A87C33  0%, #AA906E  30%, #A87C33 60%, #AA906E  100%) !important;
+    background: linear-gradient(45deg, #A87C33 0%, #AA906E  30%, #A87C33 60%, #AA906E  100%) !important;
     background-size: cover;
     padding-top: 15px;
   }
@@ -276,6 +276,7 @@ export default {
   .shopMain_top_icon_img {
     height: 135%;
     align-self: center;
+    box-shadow: 10px 10px 5px #888888;
   }
   .shopMain_top_info {
     width: 70%;
