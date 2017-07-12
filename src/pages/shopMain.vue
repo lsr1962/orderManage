@@ -7,7 +7,7 @@
       <div class="shopMain_top_info">
         <div class="shopMain_top_info_name">{{shop_name}}</div>
         <div class="shopMain_top_info_intro">{{shop_intro}}</div>
-        <div class="shopMain_top_info_tips">{{shop_tips}}</div>
+        <div class="shopMain_top_info_tips"><span style="background: #2DA0F7;padding: 0 2px;border-radius: 3px;">{{shop_tips}}</span></div>
       </div>
     </div>
     <div class="shopMain_sales" @click="toggleType">
@@ -53,7 +53,7 @@
           <img class="kind_item_badge_img" :src="defaultImg"/>
         </div>
         <template v-if="totalAmount > 0">
-          <div class="shopMain_list_bottom_amount">￥{{totalAmount}}元</div>
+          <div class="shopMain_list_bottom_amount">￥{{totalAmount}}</div>
           <div class="shopMain_list_bottom_pay" @click="pay">去结算</div>
         </template>
         <template v-else>
@@ -72,12 +72,14 @@
           <div>已选商品</div>
           <div class="bottom_detail_clear" @click="clear"><img class="bottom_detail_clear_icon" src="../assets/clear.png"/>清空</div>
         </div>
-        <div v-for="(item, key) in selected_menu" class="bottom_detail_item">
-          <div class="bottom_detail_item_name">{{item.name}}</div>
-          <div class="bottom_detail_item_price">￥{{item.price * item.count}}</div>
-          <div v-if="item.count > 0" class="menu_item_right_line_right_button_del"  @click="modifyCount('del', item)">-</div>
-          <div v-if="item.count > 0" class="menu_item_right_line_right_count" style="width: 60px; text-align: center;">{{item.count}}</div>
-          <div class="menu_item_right_line_right_button" @click="modifyCount('add', item)">+</div>
+        <div style="height: 300px;overflow: auto;">
+          <div v-for="(item, key) in selected_menu" class="bottom_detail_item">
+            <div class="bottom_detail_item_name">{{item.name}}</div>
+            <div class="bottom_detail_item_price">￥{{item.price * item.count}}</div>
+            <div v-if="item.count > 0" class="menu_item_right_line_right_button_del"  @click="modifyCount('del', item)">-</div>
+            <div v-if="item.count > 0" class="menu_item_right_line_right_count" style="width: 60px; text-align: center;">{{item.count}}</div>
+            <div class="menu_item_right_line_right_button" @click="modifyCount('add', item)">+</div>
+          </div>
         </div>
       </div>
     </mt-popup>
@@ -244,6 +246,9 @@ export default {
       })
       if (!flag) {
         this.salesTips = ''
+        this.$refs.list_frame.style.paddingBottom = '50px'
+      } else {
+        this.$refs.list_frame.style.paddingBottom = '80px'
       }
     },
     chosenKind (newVal) {
@@ -277,9 +282,8 @@ export default {
     flex-direction: column;
   }
   .shopMain_top_icon_img {
-    height: 135%;
+    height: 100%;
     align-self: center;
-    box-shadow: 10px 10px 5px #888888;
   }
   .shopMain_top_info {
     width: 70%;
@@ -294,12 +298,15 @@ export default {
     background-position: right;
     background-size: contain;
     margin-bottom: 10px;
+    opacity: 0.8;
   }
   .shopMain_top_info_intro {
     padding-bottom: 5px;
+    opacity: 0.8;
   }
   .shopMain_top_info_tips {
     padding-bottom: 5px;
+    opacity: 0.8;
   }
   .shopMain_sales {
     font-size: 15px;
@@ -308,13 +315,18 @@ export default {
   }
   .shopMain_sales_line {
     display: flex;
+    padding: 3px 0;
   }
   .shopMain_sales_line_detail {
-    width: 30%;
+    width: 50%;
+    background: url("../assets/reduce.png") no-repeat;
+    background-position: left;
+    background-size: contain;
+    padding-left: 25px;
     margin-left: 20px;
   }
   .shopMain_sales_line_button1 {
-    width: 70%;
+    width: 50%;
     text-align: right;
     background: url("../assets/unfold.png") no-repeat;
     background-position: right;
@@ -323,7 +335,7 @@ export default {
     margin-right: 20px;
   }
   .shopMain_sales_line_button2 {
-    width: 70%;
+    width: 50%;
     text-align: right;
     background: url("../assets/packup.png") no-repeat;
     background-position: right;
@@ -360,6 +372,7 @@ export default {
   }
   .shopMain_list_total_menu_title {
     font-size: 15px;
+    padding-bottom: 5px;
     border-bottom: 1px solid #F8F8F8;
   }
   .shopMain_list_bottom_line1 {
