@@ -1,17 +1,19 @@
 <template>
   <div class="shopMain">
     <div class="shopMain_top">
-      <img class="shopMain_top_icon" src="../assets/default_log.png">
+      <div class="shopMain_top_icon">
+        <img class="shopMain_top_icon_img" src="../assets/default_log.png">
+      </div>
       <div class="shopMain_top_info">
         <div class="shopMain_top_info_name">{{shop_name}}</div>
         <div class="shopMain_top_info_intro">{{shop_intro}}</div>
         <div class="shopMain_top_info_tips">{{shop_tips}}</div>
       </div>
     </div>
-    <div class="shopMain_sales">
+    <div class="shopMain_sales" @click="toggleType">
       <div class="shopMain_sales_line" v-for="(item, key) in salesList" :key="item.id" v-if="(key !== 0 && pullDown) || (key === 0)">
         <div class="shopMain_sales_line_detail" >{{item.name}}</div>
-        <div :class="button_type" v-if="key === 0" @click="toggleType">{{salesList.length}}个活动</div>
+        <div :class="button_type" v-if="key === 0" >{{salesList.length}}个活动</div>
       </div>
     </div>
     <div class="shopMain_list">
@@ -25,6 +27,7 @@
           </div>
         </div>
         <div class="shopMain_list_total_menu">
+          <div class="shopMain_list_total_menu_title">{{kindList[chosenKind].name}}</div>
           <div v-for="(item, key) in menuList" :key="item.id" class="menu_item">
             <div class="menu_item_left">
               <img class="menu_item_left_img" :src="item.img || defaultImg"/>
@@ -34,7 +37,7 @@
               <div class="menu_item_right_line">
                 <div class="menu_item_right_line_left">￥{{item.price}}</div>
                 <div class="menu_item_right_line_right">
-                  <div v-if="item.count > 0" class="menu_item_right_line_right_button"  @click="modifyCount('del', item)">-</div>
+                  <div v-if="item.count > 0" class="menu_item_right_line_right_button_del"  @click="modifyCount('del', item)">-</div>
                   <div v-if="item.count > 0" class="menu_item_right_line_right_count">{{item.count}}</div>
                   <div class="menu_item_right_line_right_button" @click="modifyCount('add', item)">+</div>
                 </div>
@@ -43,13 +46,20 @@
           </div>
         </div>
       </div>
-      <div class="shopMain_list_bottom">
+      <div class="shopMain_list_bottom_line1" v-if="salesTips">{{salesTips}}</div>
+      <div class="shopMain_list_bottom_line2">
         <div class="shopMain_list_bottom_icon" @click="selected_menu.length > 0 ? (popupVisible = true) : ''">
           <mt-badge class="kind_item_badge" color="red" v-if="totalCount > 0" size="small">{{totalCount}}</mt-badge>
           <img class="kind_item_badge_img" :src="defaultImg"/>
         </div>
-        <div class="shopMain_list_bottom_amount">￥{{totalAmount}}元</div>
-        <div class="shopMain_list_bottom_pay">去结算</div>
+        <template v-if="totalAmount > 0">
+          <div class="shopMain_list_bottom_amount">￥{{totalAmount}}元</div>
+          <div class="shopMain_list_bottom_pay">去结算</div>
+        </template>
+        <template v-else>
+          <div class="shopMain_list_bottom_noSelected">未选择商品</div>
+          <div class="shopMain_list_bottom_pay_noSelected">￥20起送</div>
+        </template>
       </div>
     </div>
     <mt-popup
@@ -62,9 +72,9 @@
           <div class="bottom_detail_clear" @click="clear"><img class="bottom_detail_clear_icon" src="../assets/clear.png"/>清空</div>
         </div>
         <div v-for="(item, key) in selected_menu" class="bottom_detail_item">
-          <div>{{item.name}}</div>
-          <div>{{item.price}}</div>
-          <div v-if="item.count > 0" class="menu_item_right_line_right_button"  @click="modifyCount('del', item)">-</div>
+          <div class="bottom_detail_item_name">{{item.name}}</div>
+          <div class="bottom_detail_item_price">{{item.price}}</div>
+          <div v-if="item.count > 0" class="menu_item_right_line_right_button_del"  @click="modifyCount('del', item)">-</div>
           <div v-if="item.count > 0" class="menu_item_right_line_right_count">{{item.count}}</div>
           <div class="menu_item_right_line_right_button" @click="modifyCount('add', item)">+</div>
         </div>
@@ -94,15 +104,16 @@ export default {
       chosenKind: 0,
       totalCount: 0,
       totalAmount: 0,
+      salesTips: '',
       shop_name: '店铺名称店铺名称',
       shop_intro: '店铺介绍信息',
       shop_tips: '店铺提示信息',
       defaultImg: require('../assets/default_log.png'),
       salesList: [
-        {id: '1', name: '满20减12'},
-        {id: '2', name: '满100减20'},
-        {id: '3', name: '满500减100'},
-        {id: '4', name: '满1000减200'}
+        {id: '1', name: '满20减12', gate: 20, reduce: 12},
+        {id: '2', name: '满100减20', gate: 100, reduce: 20},
+        {id: '3', name: '满500减100', gate: 500, reduce: 100},
+        {id: '4', name: '满1000减200', gate: 1000, reduce: 200}
       ],
       kindList: [
         {type: '1', name: '热销', count: 0},
@@ -221,6 +232,16 @@ export default {
       if (newVal.length === 0) {
         this.popupVisible = false
       }
+      var flag = false
+      this.salesList.forEach((val) => {
+        if (val.gate <= tmpTotalAmount) {
+          flag = true
+          this.salesTips = `已满${val.gate},结算减${val.reduce}元`
+        }
+      })
+      if (!flag) {
+        this.salesTips = ''
+      }
     },
     chosenKind (newVal) {
       this.getCurrentMenuList(newVal)
@@ -238,7 +259,9 @@ export default {
     font-size: 16px;
     color: #FFFFFF;
     text-align: left;
-    background: #34A1FB;
+    background: -moz-linear-gradient(left, #A87C33  0%, #AA906E  50%, #A87C33 100%) !important;
+    background: -webkit-linear-gradient(left, #A87C33  0%, #AA906E  50%, #A87C33 100%) !important;
+    background: linear-gradient(to right, #A87C33 0%, #AA906E  50%, #A87C33 100%) !important;
     background-size: cover;
     padding-top: 15px;
   }
@@ -246,6 +269,12 @@ export default {
     width: 60px;
     height: 60px;
     margin: 10px 15px;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+  }
+  .shopMain_top_icon_img {
+    height: 135%;
     align-self: center;
   }
   .shopMain_top_info {
@@ -263,24 +292,32 @@ export default {
   }
   .shopMain_sales {
     font-size: 15px;
-    padding: 15px 0;
+    padding-top: 15px;
   }
   .shopMain_sales_line {
-    padding: 5px 10px;
     display: flex;
-    justify-content: space-between;
+  }
+  .shopMain_sales_line_detail {
+    width: 30%;
+    margin-left: 20px;
   }
   .shopMain_sales_line_button1 {
+    width: 70%;
+    text-align: right;
     background: url("../assets/unfold.png") no-repeat;
     background-position: right;
     background-size: contain;
     padding-right: 20px;
+    margin-right: 20px;
   }
   .shopMain_sales_line_button2 {
+    width: 70%;
+    text-align: right;
     background: url("../assets/packup.png") no-repeat;
     background-position: right;
     background-size: contain;
     padding-right: 20px;
+    margin-right: 20px;
   }
   .shopMain_list {
     position: relative;
@@ -289,10 +326,12 @@ export default {
     display: flex;
     justify-content: center;
     padding-bottom: 50px;
-    border-top: 1px solid #34A1FB;
+    border-top: 1px solid #F8F8F8;
   }
   .shopMain_list_title {
-    padding: 0 0 5px 15px;
+    width: 30%;
+    padding: 10px 0;
+    text-align: center;
     font-size: 20px;
     color: #34A1FB;
   }
@@ -307,19 +346,39 @@ export default {
     overflow: auto;
     padding: 10px;
   }
-  .shopMain_list_bottom {
+  .shopMain_list_total_menu_title {
+    font-size: 15px;
+    border-bottom: 1px solid #F8F8F8;
+  }
+  .shopMain_list_bottom_line1 {
+    height: 20px;
+    opacity: 0.5;
+    background: #FFFBD8;
+    color: #595554;
+    font-size: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: 50px;
+    width: 100%;
+    font-weight: bold;
+  }
+  .shopMain_list_bottom_line2 {
     height: 50px;
+    display: flex;
+    justify-content: space-between;
     position: absolute;
     bottom: 0;
     width: 100%;
-    background: #34A1FB;
-    display: flex;
-    justify-content: space-between;
+    background: #595554;
     color: #FFFFFF;
+    font-weight: bold;
   }
   .shopMain_list_bottom_icon {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     flex-direction: column;
     position: relative;
     padding-left: 15px;
@@ -327,6 +386,11 @@ export default {
   .shopMain_list_bottom_amount {
     font-size: 20px;
     align-self: center;
+  }
+  .shopMain_list_bottom_noSelected {
+    font-size: 14px;
+    align-self: center;
+    color: #988B83;
   }
   .shopMain_list_bottom_pay {
     font-size: 20px;
@@ -337,6 +401,17 @@ export default {
     align-self: center;
     height: 100%;
     background: #00D762;
+  }
+  .shopMain_list_bottom_pay_noSelected {
+    font-size: 14px;
+    padding: 0 15px;
+    display: flex;
+    color: #988B83;
+    justify-content: center;
+    flex-direction: column;
+    align-self: center;
+    height: 100%;
+    background: #5E6669;
   }
   .kind_item {
     font-size: 15px;
@@ -363,7 +438,7 @@ export default {
     right: 0;
   }
   .kind_item_badge_img {
-    height: 50px;
+    height: 60px;
   }
   .chosen {
     background: #ffffff;
@@ -375,6 +450,7 @@ export default {
     justify-content: center;
     text-align: center;
     padding-bottom: 5px;
+    border-bottom: 1px solid #F8F8F8;
   }
   .menu_item_left {
     width: 30%;
@@ -417,10 +493,24 @@ export default {
     padding: 0 15px;
   }
   .menu_item_right_line_right_button {
-    border-radius: 99px;
+    border-radius: 15px;
     background-color: #34A1FB;
     color: #FFFFFF;
-    font-size: 15px;
+    font-size: 20px;
+    height: 30px;
+    width: 30px;
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  .menu_item_right_line_right_button_del {
+    border-radius: 15px;
+    background-color: #FFFFFF;
+    border: 1px solid #34A1FB;
+    color: #34A1FB;
+    font-size: 20px;
     height: 30px;
     width: 30px;
     display: flex;
@@ -459,6 +549,12 @@ export default {
     display: flex;
     justify-content: space-between;
     padding: 5px 10px;
+  }
+  .bottom_detail_item_name {
+    width: 100px;
+  }
+  .bottom_detail_item_price {
+    width: 100px;
   }
   .bottom_detail_tips {
     background: #ECECEE;
