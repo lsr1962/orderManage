@@ -35,7 +35,7 @@
             <div class="menu_item_right">
               <div class="menu_item_right_title">{{item.name}}</div>
               <div class="menu_item_right_line">
-                <div class="menu_item_right_line_left">￥{{item.price}}</div>
+                <div class="menu_item_right_line_left"><span style="font-size: 15px;">￥</span>{{item.price}}</div>
                 <div class="menu_item_right_line_right">
                   <div v-if="item.count > 0" class="menu_item_right_line_right_button_del"  @click="modifyCount('del', item)">-</div>
                   <div v-if="item.count > 0" class="menu_item_right_line_right_count">{{item.count}}</div>
@@ -48,13 +48,13 @@
       </div>
       <div class="shopMain_list_bottom_line1" v-if="salesTips">{{salesTips}}</div>
       <div class="shopMain_list_bottom_line2">
-        <div class="shopMain_list_bottom_icon" @click="selected_menu.length > 0 ? (popupVisible = true) : ''">
+        <div class="shopMain_list_bottom_icon" @click="selected_menu.length > 0 ? (popupVisible = !popupVisible) : ''">
           <mt-badge class="kind_item_badge" color="red" v-if="totalCount > 0" size="small">{{totalCount}}</mt-badge>
           <img class="kind_item_badge_img" :src="defaultImg"/>
         </div>
         <template v-if="totalAmount > 0">
           <div class="shopMain_list_bottom_amount">￥{{totalAmount}}元</div>
-          <div class="shopMain_list_bottom_pay">去结算</div>
+          <div class="shopMain_list_bottom_pay" @click="pay">去结算</div>
         </template>
         <template v-else>
           <div class="shopMain_list_bottom_noSelected">未选择商品</div>
@@ -67,25 +67,25 @@
       class="selected_detail"
       position="bottom">
       <div>
+        <div class="shopMain_list_bottom_line3" v-if="salesTips">{{salesTips}}</div>
         <div class="bottom_detail_title">
           <div>已选商品</div>
           <div class="bottom_detail_clear" @click="clear"><img class="bottom_detail_clear_icon" src="../assets/clear.png"/>清空</div>
         </div>
         <div v-for="(item, key) in selected_menu" class="bottom_detail_item">
           <div class="bottom_detail_item_name">{{item.name}}</div>
-          <div class="bottom_detail_item_price">{{item.price}}</div>
+          <div class="bottom_detail_item_price">￥{{item.price * item.count}}</div>
           <div v-if="item.count > 0" class="menu_item_right_line_right_button_del"  @click="modifyCount('del', item)">-</div>
-          <div v-if="item.count > 0" class="menu_item_right_line_right_count">{{item.count}}</div>
+          <div v-if="item.count > 0" class="menu_item_right_line_right_count" style="width: 60px; text-align: center;">{{item.count}}</div>
           <div class="menu_item_right_line_right_button" @click="modifyCount('add', item)">+</div>
         </div>
-        <div class="bottom_detail_tips"></div>
       </div>
     </mt-popup>
   </div>
 </template>
 
 <script>
-import { Popup, Badge, PaletteButton } from 'mint-ui'
+import { Popup, Badge, PaletteButton, MessageBox } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
@@ -217,6 +217,9 @@ export default {
       this.kindList.forEach((val) => {
         val.count = 0
       })
+    },
+    pay () {
+      MessageBox(`总金额${this.totalAmount},总个数${this.totalCount}`)
     }
   },
   watch: {
@@ -253,7 +256,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   .shopMain_top {
-    height: 100%;
+    height: 120px;
     display: flex;
     justify-content: center;
     font-size: 16px;
@@ -290,10 +293,18 @@ export default {
     background: url("../assets/more.png") no-repeat;
     background-position: right;
     background-size: contain;
+    margin-bottom: 10px;
+  }
+  .shopMain_top_info_intro {
+    padding-bottom: 5px;
+  }
+  .shopMain_top_info_tips {
+    padding-bottom: 5px;
   }
   .shopMain_sales {
     font-size: 15px;
-    padding-top: 15px;
+    padding-top: 25px;
+    padding-bottom: 15px;
   }
   .shopMain_sales_line {
     display: flex;
@@ -352,11 +363,10 @@ export default {
     border-bottom: 1px solid #F8F8F8;
   }
   .shopMain_list_bottom_line1 {
-    height: 20px;
-    opacity: 0.5;
+    height: 30px;
     background: #FFFBD8;
     color: #595554;
-    font-size: 10px;
+    font-size: 15px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -376,6 +386,19 @@ export default {
     background: #595554;
     color: #FFFFFF;
     font-weight: bold;
+    z-index: 9999;
+  }
+  .shopMain_list_bottom_line3 {
+    height: 30px;
+    background: #FFFBD8;
+    color: #595554;
+    font-size: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    font-weight: bold;
   }
   .shopMain_list_bottom_icon {
     display: flex;
@@ -386,11 +409,17 @@ export default {
   }
   .shopMain_list_bottom_amount {
     font-size: 20px;
-    align-self: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 50%;
   }
   .shopMain_list_bottom_noSelected {
     font-size: 14px;
-    align-self: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 50%;
     color: #988B83;
   }
   .shopMain_list_bottom_pay {
@@ -416,7 +445,7 @@ export default {
   }
   .kind_item {
     font-size: 15px;
-    height: 50px;
+    height: 70px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -430,8 +459,7 @@ export default {
     margin: auto 15%;
     width: 70%;
     height: 1px;
-    background-color: #34A1FB;
-    opacity: 0.3;
+    background-color: #F0F0F0;
   }
   .kind_item_badge {
     position: absolute;
@@ -439,7 +467,7 @@ export default {
     right: 0;
   }
   .kind_item_badge_img {
-    height: 60px;
+    height: 50px;
   }
   .chosen {
     background: #ffffff;
@@ -476,8 +504,8 @@ export default {
   .menu_item_right_line {
     display: flex;
     justify-content: space-between;
-    font-size: 15px;
-    color: #34A1FB;
+    font-size: 20px;
+    color: #E46D5D;
   }
   .menu_item_right_line_left {
     align-self: center;
@@ -529,7 +557,6 @@ export default {
     justify-content: space-between;
     padding: 5px 10px;
     font-size: 20px;
-    color: #34A1FB;
     background: #ECECEE;
     height: 45px;
     align-items: center;
@@ -550,12 +577,25 @@ export default {
     display: flex;
     justify-content: space-between;
     padding: 5px 10px;
+    height: 50px;
+    border-bottom: 1px solid #F8F8F8;
   }
   .bottom_detail_item_name {
-    width: 100px;
+    width: 50%;
+    display: flex;
+    align-self: center;
+    align-items: left;
+    flex-direction: column;
   }
   .bottom_detail_item_price {
-    width: 100px;
+    width: 15%;
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    align-items: center;
+    flex-direction: column;
+    color: #E46D5D;
+    font-weight: bold;
   }
   .bottom_detail_tips {
     background: #ECECEE;

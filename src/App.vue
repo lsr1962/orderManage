@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <mt-header :style="{ paddingTop: iosFixed, height: iosFixedHeight, fontSize: '20px' }" :title="$route.meta.title" v-if="!($route.meta.home)">
+    <mt-header :style="{ paddingTop: iosFixed, height: iosFixedHeight, fontSize: '20px', display: 'none' }" :title="$route.meta.title" v-if="!($route.meta.home)">
       <div slot="left" class="backBtn" @click="goBack"></div>
       <div v-if="$route.meta.right" slot="right" @click="triggerRight">{{$route.meta.right}}</div>
     </mt-header>

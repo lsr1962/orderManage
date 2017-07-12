@@ -7,7 +7,7 @@ const shopMain = r => require.ensure([], () => r(require('../pages/shopMain.vue'
 export default new Router({
   routes: [
     {
-      path: '/',
+      path: '/shopMain',
       name: 'shopMain',
       component: shopMain,
       meta: {
