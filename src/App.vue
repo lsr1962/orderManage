@@ -45,7 +45,7 @@
   #app {
     margin: 0;
     padding: 0;
-    color: #2c3e50;
+    color: #000000;
   }
   .backBtn {
     background: url(./assets/btn_back@2x.png) no-repeat;

@@ -7,7 +7,7 @@
       <div class="shopMain_top_info">
         <div class="shopMain_top_info_name">{{shop_name}}</div>
         <div class="shopMain_top_info_intro">{{shop_intro}}</div>
-        <div class="shopMain_top_info_tips"><span style="background: #2DA0F7;padding: 0 2px;border-radius: 3px;">{{shop_tips}}</span></div>
+        <div class="shopMain_top_info_tips"><span style="background: #0091ff;padding: 0 2px;border-radius: 3px;">{{shop_tips}}</span></div>
       </div>
     </div>
     <div class="shopMain_sales" @click="toggleType">
@@ -35,7 +35,7 @@
             <div class="menu_item_right">
               <div class="menu_item_right_title">{{item.name}}</div>
               <div class="menu_item_right_line">
-                <div class="menu_item_right_line_left"><span style="font-size: 15px;">￥</span>{{item.price}}</div>
+                <div class="menu_item_right_line_left"><span style="font-size: 11px;">￥</span>{{item.price}}</div>
                 <div class="menu_item_right_line_right">
                   <div v-if="item.count > 0" class="menu_item_right_line_right_button_del"  @click="modifyCount('del', item)">-</div>
                   <div v-if="item.count > 0" class="menu_item_right_line_right_count">{{item.count}}</div>
@@ -46,8 +46,8 @@
           </div>
         </div>
       </div>
-      <div class="shopMain_list_bottom_line1" v-if="salesTips">{{salesTips}}</div>
-      <div class="shopMain_list_bottom_line2">
+      <div class="shopMain_list_bottom_line1" v-if="salesTips">已满{{salesTips}}元，结算减<font style="color: #ff5339">{{salesTips2}}</font>元</div>
+      <div class="shopMain_list_bottom_line2" :style="{background: shopMain_list_bottom_line2_background}">
         <div class="shopMain_list_bottom_icon" @click="selected_menu.length > 0 ? (popupVisible = !popupVisible) : ''">
           <mt-badge class="kind_item_badge" color="red" v-if="totalCount > 0" size="small">{{totalCount}}</mt-badge>
           <img class="kind_item_badge_img" :src="defaultImg"/>
@@ -67,12 +67,12 @@
       class="selected_detail"
       position="bottom">
       <div>
-        <div class="shopMain_list_bottom_line3" v-if="salesTips">{{salesTips}}</div>
+        <div class="shopMain_list_bottom_line3" v-if="salesTips">已满{{salesTips}}元，结算减<span style="color: #ff5339">{{salesTips2}}</span>元</div>
         <div class="bottom_detail_title">
-          <div>已选商品</div>
-          <div class="bottom_detail_clear" @click="clear"><img class="bottom_detail_clear_icon" src="../assets/clear.png"/>清空</div>
+          <div class="bottom_detail_title_text">已选商品</div>
+          <div class="bottom_detail_clear" @click="clear"><img class="bottom_detail_clear_icon" src="../assets/clear.png"/><div class="bottom_detail_clear_text">清空</div></div>
         </div>
-        <div style="height: 300px;overflow: auto;">
+        <div style="max-height: 270px;overflow: auto;">
           <div v-for="(item, key) in selected_menu" class="bottom_detail_item">
             <div class="bottom_detail_item_name">{{item.name}}</div>
             <div class="bottom_detail_item_price">￥{{item.price * item.count}}</div>
@@ -107,10 +107,12 @@ export default {
       totalCount: 0,
       totalAmount: 0,
       salesTips: '',
+      salesTips2: '',
       shop_name: '店铺名称店铺名称',
       shop_intro: '店铺介绍信息',
       shop_tips: '店铺提示信息',
       defaultImg: require('../assets/default_log.png'),
+      shopMain_list_bottom_line2_background: '',
       salesList: [
         {id: '1', name: '满20减12', gate: 20, reduce: 12},
         {id: '2', name: '满100减20', gate: 100, reduce: 20},
@@ -236,19 +238,23 @@ export default {
       this.totalAmount = tmpTotalAmount
       if (newVal.length === 0) {
         this.popupVisible = false
+        this.shopMain_list_bottom_line2_background = '#595959'
+      } else {
+        this.shopMain_list_bottom_line2_background = '#1b251f'
       }
       var flag = false
       this.salesList.forEach((val) => {
         if (val.gate <= tmpTotalAmount) {
           flag = true
-          this.salesTips = `已满${val.gate},结算减${val.reduce}元`
+          this.salesTips = val.gate
+          this.salesTips2 = val.reduce
         }
       })
       if (!flag) {
         this.salesTips = ''
-        this.$refs.list_frame.style.paddingBottom = '50px'
+        this.$refs.list_frame.style.paddingBottom = '48px'
       } else {
-        this.$refs.list_frame.style.paddingBottom = '80px'
+        this.$refs.list_frame.style.paddingBottom = '76px'
       }
     },
     chosenKind (newVal) {
@@ -264,14 +270,13 @@ export default {
     height: 120px;
     display: flex;
     justify-content: center;
-    font-size: 16px;
     color: #FFFFFF;
     text-align: left;
     background: -moz-linear-gradient(45deg, #A87C33  0%, #AA906E  30%, #A87C33 60%, #AA906E  100%) !important;
     background: -webkit-linear-gradient(45deg, #A87C33  0%, #AA906E  30%, #A87C33 60%, #AA906E  100%) !important;
     background: linear-gradient(45deg, #A87C33 0%, #AA906E  30%, #A87C33 60%, #AA906E  100%) !important;
     background-size: cover;
-    padding-top: 15px;
+    padding-top: 20px;
   }
   .shopMain_top_icon {
     width: 60px;
@@ -286,6 +291,7 @@ export default {
     align-self: center;
   }
   .shopMain_top_info {
+    font-size: 11px;
     width: 70%;
     padding: 10px 0 10px 15px;
     display: flex;
@@ -293,23 +299,20 @@ export default {
     justify-content: center;
   }
   .shopMain_top_info_name {
-    font-size: 20px;
+    font-size: 18px;
+    font-weight: bold;
     background: url("../assets/more.png") no-repeat;
     background-position: right;
     background-size: contain;
-    margin-bottom: 10px;
-    opacity: 0.8;
+    margin-bottom: 7px;
   }
   .shopMain_top_info_intro {
-    padding-bottom: 5px;
-    opacity: 0.8;
+    padding-bottom: 7px;
+    color: #f7f3ed;
   }
   .shopMain_top_info_tips {
-    padding-bottom: 5px;
-    opacity: 0.8;
   }
   .shopMain_sales {
-    font-size: 15px;
     padding-top: 25px;
     padding-bottom: 15px;
   }
@@ -324,6 +327,7 @@ export default {
     background-size: contain;
     padding-left: 25px;
     margin-left: 20px;
+    color: #666666;
   }
   .shopMain_sales_line_button1 {
     width: 50%;
@@ -333,6 +337,7 @@ export default {
     background-size: contain;
     padding-right: 20px;
     margin-right: 20px;
+    color: #AEAEAE;
   }
   .shopMain_sales_line_button2 {
     width: 50%;
@@ -342,6 +347,7 @@ export default {
     background-size: contain;
     padding-right: 20px;
     margin-right: 20px;
+    color: #AEAEAE;
   }
   .shopMain_list {
     position: relative;
@@ -371,43 +377,40 @@ export default {
     padding: 10px;
   }
   .shopMain_list_total_menu_title {
-    font-size: 15px;
     padding-bottom: 5px;
     border-bottom: 1px solid #F8F8F8;
   }
   .shopMain_list_bottom_line1 {
-    height: 30px;
-    background: #FFFBD8;
-    color: #595554;
+    height: 28px;
+    background: #FAF5D3;
+    color: #333333;
     font-size: 15px;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     position: absolute;
-    bottom: 50px;
+    bottom: 48px;
     width: 100%;
     font-weight: bold;
   }
   .shopMain_list_bottom_line2 {
-    height: 50px;
+    height: 48px;
     display: flex;
     justify-content: space-between;
     position: absolute;
     bottom: 0;
     width: 100%;
-    background: #595554;
+    background: #595959;
     color: #FFFFFF;
     font-weight: bold;
     z-index: 9999;
   }
   .shopMain_list_bottom_line3 {
-    height: 30px;
-    background: #FFFBD8;
-    color: #595554;
+    height: 28px;
+    background: #FAF5D3;
+    color: #333333;
     font-size: 15px;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
@@ -421,22 +424,22 @@ export default {
     padding-left: 15px;
   }
   .shopMain_list_bottom_amount {
-    font-size: 20px;
+    font-size: 18px;
     display: flex;
     justify-content: center;
     flex-direction: column;
     width: 50%;
   }
   .shopMain_list_bottom_noSelected {
-    font-size: 14px;
+    font-size: 13px;
     display: flex;
     justify-content: center;
     flex-direction: column;
     width: 50%;
-    color: #988B83;
+    color: #aca9a7;
   }
   .shopMain_list_bottom_pay {
-    font-size: 20px;
+    font-size: 17px;
     padding: 0 15px;
     display: flex;
     justify-content: center;
@@ -446,18 +449,17 @@ export default {
     background: #00D762;
   }
   .shopMain_list_bottom_pay_noSelected {
-    font-size: 14px;
+    font-size: 15px;
     padding: 0 15px;
     display: flex;
-    color: #988B83;
+    color: #b4b4b4;
     justify-content: center;
     flex-direction: column;
     align-self: center;
     height: 100%;
-    background: #5E6669;
+    background: #6a6a6a;
   }
   .kind_item {
-    font-size: 15px;
     height: 70px;
     display: flex;
     flex-direction: column;
@@ -486,8 +488,7 @@ export default {
     background: #ffffff;
   }
   .menu_item {
-    font-size: 15px;
-    height: 100px;
+    height: 98px;
     display: flex;
     justify-content: center;
     text-align: center;
@@ -511,17 +512,16 @@ export default {
     justify-content: space-around;
   }
   .menu_item_right_title {
-    font-size: 20px;
     text-align: left;
   }
   .menu_item_right_line {
     display: flex;
     justify-content: space-between;
-    font-size: 20px;
     color: #E46D5D;
   }
   .menu_item_right_line_left {
     align-self: center;
+    font-size: 16px;
   }
   .menu_item_right_line_right {
     display: flex;
@@ -533,14 +533,15 @@ export default {
     align-self: center;
     flex-direction: column;
     padding: 0 15px;
+    color: #666666;
   }
   .menu_item_right_line_right_button {
     border-radius: 15px;
     background-color: #34A1FB;
     color: #FFFFFF;
     font-size: 20px;
-    height: 30px;
-    width: 30px;
+    height: 22px;
+    width: 22px;
     display: flex;
     justify-content: center;
     align-self: center;
@@ -553,8 +554,8 @@ export default {
     border: 1px solid #34A1FB;
     color: #34A1FB;
     font-size: 20px;
-    height: 30px;
-    width: 30px;
+    height: 22px;
+    width: 22px;
     display: flex;
     justify-content: center;
     align-self: center;
@@ -563,23 +564,34 @@ export default {
   }
   .selected_detail {
     width: 100%;
-    bottom: 50px;
+    bottom: 48px;
   }
   .bottom_detail_title {
     display: flex;
     justify-content: space-between;
     padding: 5px 10px;
     font-size: 20px;
+    color: #666666;
     background: #ECECEE;
     height: 45px;
     align-items: center;
   }
+  .bottom_detail_title_text {
+    font-size: 16px;
+    font-weight: bold;
+  }
   .bottom_detail_clear {
     height: 100%;
-    font-size: 15px;
+    font-size: 12px;
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  .bottom_detail_clear_text {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
   .bottom_detail_clear_icon {
     height: 50%;
@@ -590,8 +602,9 @@ export default {
     display: flex;
     justify-content: space-between;
     padding: 5px 10px;
-    height: 50px;
-    border-bottom: 1px solid #F8F8F8;
+    height: 55px;
+    font-size: 16px;
+    border-bottom: 1px solid #eeeeee;
   }
   .bottom_detail_item_name {
     width: 50%;
