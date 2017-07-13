@@ -77,7 +77,7 @@
             <div class="bottom_detail_item_name">{{item.name}}</div>
             <div class="bottom_detail_item_price">￥{{item.price * item.count}}</div>
             <div v-if="item.count > 0" class="menu_item_right_line_right_button_del"  @click="modifyCount('del', item)"></div>
-            <div v-if="item.count > 0" class="menu_item_right_line_right_count" style="width: 60px; text-align: center;">{{item.count}}</div>
+            <div v-if="item.count > 0" class="menu_item_right_line_right_count" style="text-align: center;">{{item.count}}</div>
             <div class="menu_item_right_line_right_button" @click="modifyCount('add', item)"></div>
           </div>
         </div>
@@ -184,12 +184,16 @@ export default {
       if (type === 'add') {
         this.allMenuList.forEach((val) => {
           if (val.id === item.id) {
-            val.count ++
+            if (val.count < 9) {
+              val.count++
+            }
           }
         })
         this.kindList.forEach((val) => {
           if (val.type === item.kind) {
-            val.count ++
+            if (val.count < 9) {
+              val.count ++
+            }
           }
         })
       } else {
@@ -313,12 +317,12 @@ export default {
   .shopMain_top_info_tips {
   }
   .shopMain_sales {
-    padding-top: 25px;
-    padding-bottom: 15px;
+    padding: 10px 0;
   }
   .shopMain_sales_line {
     display: flex;
     padding: 3px 0;
+    font-size: 12px;
   }
   .shopMain_sales_line_detail {
     width: 50%;
@@ -379,6 +383,7 @@ export default {
   .shopMain_list_total_menu_title {
     padding-bottom: 5px;
     border-bottom: 1px solid #F8F8F8;
+    color: #666666;
   }
   .shopMain_list_bottom_line1 {
     height: 28px;
@@ -467,6 +472,7 @@ export default {
     text-align: center;
     background: #F8F8F8;
     position: relative;
+    color: #666666
   }
   .kind_item_line {
     position: absolute;
@@ -485,6 +491,8 @@ export default {
     height: 50px;
   }
   .chosen {
+    color: #000000;
+    font-weight: bold;
     background: #ffffff;
   }
   .menu_item {
@@ -512,6 +520,7 @@ export default {
     justify-content: space-around;
   }
   .menu_item_right_title {
+    font-weight: bold;
     text-align: left;
   }
   .menu_item_right_line {
