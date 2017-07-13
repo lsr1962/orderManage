@@ -37,9 +37,9 @@
               <div class="menu_item_right_line">
                 <div class="menu_item_right_line_left"><span style="font-size: 11px;">￥</span>{{item.price}}</div>
                 <div class="menu_item_right_line_right">
-                  <div v-if="item.count > 0" class="menu_item_right_line_right_button_del"  @click="modifyCount('del', item)">-</div>
+                  <div v-if="item.count > 0" class="menu_item_right_line_right_button_del"  @click="modifyCount('del', item)"></div>
                   <div v-if="item.count > 0" class="menu_item_right_line_right_count">{{item.count}}</div>
-                  <div class="menu_item_right_line_right_button" @click="modifyCount('add', item)">+</div>
+                  <div class="menu_item_right_line_right_button" @click="modifyCount('add', item)"></div>
                 </div>
               </div>
             </div>
@@ -76,9 +76,9 @@
           <div v-for="(item, key) in selected_menu" class="bottom_detail_item">
             <div class="bottom_detail_item_name">{{item.name}}</div>
             <div class="bottom_detail_item_price">￥{{item.price * item.count}}</div>
-            <div v-if="item.count > 0" class="menu_item_right_line_right_button_del"  @click="modifyCount('del', item)">-</div>
+            <div v-if="item.count > 0" class="menu_item_right_line_right_button_del"  @click="modifyCount('del', item)"></div>
             <div v-if="item.count > 0" class="menu_item_right_line_right_count" style="width: 60px; text-align: center;">{{item.count}}</div>
-            <div class="menu_item_right_line_right_button" @click="modifyCount('add', item)">+</div>
+            <div class="menu_item_right_line_right_button" @click="modifyCount('add', item)"></div>
           </div>
         </div>
       </div>
@@ -537,8 +537,9 @@ export default {
   }
   .menu_item_right_line_right_button {
     border-radius: 15px;
-    background-color: #34A1FB;
-    color: #FFFFFF;
+    background: #34A1FB url('../assets/add.png') no-repeat;
+    background-position: center;
+    background-size: 50%;
     font-size: 20px;
     height: 22px;
     width: 22px;
@@ -550,9 +551,10 @@ export default {
   }
   .menu_item_right_line_right_button_del {
     border-radius: 15px;
-    background-color: #FFFFFF;
+    background: #ffffff url('../assets/minus.png') no-repeat;
+    background-position: center;
+    background-size: 50%;
     border: 1px solid #34A1FB;
-    color: #34A1FB;
     font-size: 20px;
     height: 22px;
     width: 22px;
