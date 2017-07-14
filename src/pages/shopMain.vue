@@ -88,12 +88,26 @@
 </template>
 
 <script>
-import { Popup, Badge, PaletteButton, MessageBox } from 'mint-ui'
+import { Popup, Badge, PaletteButton } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
     this.resizeList()
     this.getCurrentMenuList(0)
+    var lastMenu = window.localStorage.getItem('yjiatech_menu')
+    if (lastMenu) {
+      try {
+        JSON.parse(lastMenu).forEach((item) => {
+          this.allMenuList.forEach((val) => {
+            if (val.id === item.id) {
+              val.count = item.count
+            }
+          })
+        })
+      } catch (e) {
+
+      }
+    }
   },
   components: {
     [PaletteButton.name]: PaletteButton,
@@ -228,7 +242,8 @@ export default {
       })
     },
     pay () {
-      MessageBox(`总金额${this.totalAmount},总个数${this.totalCount}`)
+      window.localStorage.setItem('yjiatech_menu', JSON.stringify(this.selected_menu))
+      this.$router.push({name: 'confirmOrder', params: {order: this.selected_menu, discount: this.salesTips2}})
     }
   },
   watch: {

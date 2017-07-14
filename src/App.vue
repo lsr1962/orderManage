@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <mt-header :style="{ paddingTop: iosFixed, height: iosFixedHeight, fontSize: '20px', display: 'none' }" :title="$route.meta.title" v-if="!($route.meta.home)">
+    <mt-header ref="header" style="fontSize: 20px; display: none;" :title="$route.meta.title" v-show="!($route.meta.home)">
       <div slot="left" class="backBtn" @click="goBack"></div>
       <div v-if="$route.meta.right" slot="right" @click="triggerRight">{{$route.meta.right}}</div>
     </mt-header>
@@ -14,10 +14,6 @@
   import { Header } from 'mint-ui'
   export default {
     mounted () {
-      if (window.navigator.userAgent.indexOf('iPhone') > -1) {
-        this.iosFixed = '20px'
-        this.iosFixedHeight = '64px'
-      }
     },
     components: {
       [Header.name]: Header
@@ -55,13 +51,6 @@
     flex-direction: column;
     justify-content: center;
     height: 44px;
-  }
-  .mint-header {
-    height: 44px;
-    line-height: 44px;
-    background: -moz-linear-gradient(left, #3FC2F1  0%, #3479DE 100%) !important;
-    background: -webkit-linear-gradient(left, #3FC2F1  0%, #3479DE 100%) !important;
-    background: linear-gradient(to right, #3FC2F1 0%,#3479DE 100%) !important;
   }
   .merchant-slide-enter {
     opacity: 0;

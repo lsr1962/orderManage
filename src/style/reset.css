@@ -57,9 +57,7 @@ a {
 .mint-header {
   height: 44px;
   line-height: 44px;
-  background: -moz-linear-gradient(left, #3FC2F1  0%, #3479DE 100%) !important;
-  background: -webkit-linear-gradient(left, #3FC2F1  0%, #3479DE 100%) !important;
-  background: linear-gradient(to right, #3FC2F1 0%,#3479DE 100%) !important;
+  background: #039CFE;
 }
 .mint-header-title {
 
