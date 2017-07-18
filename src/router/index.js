@@ -6,6 +6,7 @@ const shopMain = r => require.ensure([], () => r(require('../pages/shopMain.vue'
 const confirmOrder = r => require.ensure([], () => r(require('../pages/confirmOrder.vue')), 'confirmOrder')
 const payOrder = r => require.ensure([], () => r(require('../pages/payOrder.vue')), 'payOrder')
 const payFinish = r => require.ensure([], () => r(require('../pages/payFinish.vue')), 'payFinish')
+const orderList = r => require.ensure([], () => r(require('../pages/orderList.vue')), 'orderList')
 
 export default new Router({
   routes: [
@@ -40,6 +41,14 @@ export default new Router({
       component: payFinish,
       meta: {
         title: '订单完成'
+      }
+    },
+    {
+      path: '/orderList',
+      name: 'orderList',
+      component: orderList,
+      meta: {
+        title: '订单列表'
       }
     }
   ]

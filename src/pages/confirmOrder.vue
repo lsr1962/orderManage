@@ -4,7 +4,7 @@
       <div class="order_confirm_top">
         <div class="title">
           <div class="title_line"></div>
-          <div class="title_text">{{shop_name}}</div>
+          <div class="title_text">{{shopInfo.shop_name}}</div>
           <div class="title_line"></div>
         </div>
         <div v-for="item in list" class="order_line">
@@ -75,9 +75,9 @@ import { Popup, Header } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
-    if (this.userInfo.order.length > 0) {
-      this.list = this.userInfo.order
-      this.discount = this.userInfo.discount
+    if (this.orderInfo.order.length > 0) {
+      this.list = this.orderInfo.order
+      this.discount = this.orderInfo.discount
     } else {
       this.$router.push({name: 'shopMain'})
     }
@@ -96,18 +96,11 @@ export default {
   data () {
     return {
       popupVisible: false,
-      shop_name: '店铺名称店铺名称',
       list: [],
       luckyMoneyList: [
         {name: '超级会员专享', amount: 15, startTime: '2017-07-01', endTime: '2017-07-31'},
         {name: '超级会员专享', amount: 5, startTime: '2017-06-01', endTime: '2017-08-31'},
         {name: '超级会员专享', amount: 20, startTime: '2017-06-01', endTime: '2017-07-01'}
-      ],
-      salesList: [
-        {id: '1', name: '满20减12', gate: 20, reduce: 12},
-        {id: '2', name: '满100减20', gate: 100, reduce: 20},
-        {id: '3', name: '满500减100', gate: 500, reduce: 100},
-        {id: '4', name: '满1000减200', gate: 1000, reduce: 200}
       ],
       discount: 0,
       luckyIndex: -1,
@@ -118,7 +111,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'userInfo'
+      'orderInfo',
+      'shopInfo'
     ]),
     totalAmount () {
       var tmpTotalAmount = 0
@@ -129,7 +123,7 @@ export default {
       if (tmpTotalAmount < 0) {
         tmpTotalAmount = 0
       }
-      this.userInfo.totalAmount = tmpTotalAmount
+      this.orderInfo.totalAmount = tmpTotalAmount
       return tmpTotalAmount
     }
   },
@@ -148,13 +142,13 @@ export default {
       }
     },
     pay () {
-      this.userInfo.orderId = '00001'
+      this.orderInfo.orderId = '00001'
       this.$router.push({name: 'payOrder'})
     }
   },
   watch: {
     mark (newVal) {
-      this.userInfo.mark = newVal
+      this.orderInfo.mark = newVal
     }
   }
 }

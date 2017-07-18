@@ -3,3 +3,9 @@
 export const userInfo = state => {
   return state.userInfo
 }
+export const orderInfo = state => {
+  return state.orderInfo
+}
+export const shopInfo = state => {
+  return state.shopInfo
+}

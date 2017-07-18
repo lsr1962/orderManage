@@ -9,7 +9,7 @@
       <div class="finish_tips2">{{deadline_time}}前未送达，可获得赔付</div>
       <div class="finish_tips3">商家正在备货</div>
       <div class="finish_buttons">
-        <div class="finish_button left">查看订单</div>
+        <div class="finish_button left" @click="$router.push({name: 'orderList'})">查看订单</div>
         <div class="finish_button right" @click="$router.push({name: 'shopMain'})">商家首页</div>
       </div>
       <div class="finish_luckyMoney">发红包</div>
@@ -35,8 +35,8 @@ import { Popup } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
-    if (this.userInfo.orderId) {
-      this.setUserInfo({order: []})
+    if (this.orderInfo.orderId) {
+      this.setOrderInfo({order: []})
     } else {
       this.$router.push({name: 'shopMain'})
     }
@@ -55,12 +55,12 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'userInfo'
+      'orderInfo'
     ])
   },
   methods: {
     ...mapActions([
-      'setUserInfo'
+      'setOrderInfo'
     ]),
     dateFormat (value, fmt) {
       var o = {

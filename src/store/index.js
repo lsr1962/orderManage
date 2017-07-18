@@ -6,33 +6,30 @@ import * as types from './mutation-types'
 import * as actions from './actions'
 import * as getters from './getters'
 
-import personInfo from './modules/personInfo'
-import shop from './modules/shop'
 import account from './modules/account'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    userInfo: {
-      order: [],
-      discount: 0,
-      luckyMoney: 0,
-      mark: '',
-      totalAmount: '',
-      orderId: ''
-    }
+    orderInfo: {},
+    shopInfo: {},
+    userInfo: {}
   },
   mutations: {
     [types.SET_USER_INFO] (state, userInfo) {
       state.userInfo = userInfo
+    },
+    [types.SET_ORDER_INFO] (state, orderInfo) {
+      state.orderInfo = orderInfo
+    },
+    [types.SET_SHOP_INFO] (state, shopInfo) {
+      state.shopInfo = shopInfo
     }
   },
   actions,
   getters,
   modules: {
-    personInfo,
-    shop,
     account
   }
 })

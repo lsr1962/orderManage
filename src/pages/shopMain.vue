@@ -5,19 +5,20 @@
         <img class="shopMain_top_icon_img" src="../assets/default_log.png">
       </div>
       <div class="shopMain_top_info">
-        <div class="shopMain_top_info_name">{{shop_name}}</div>
-        <div class="shopMain_top_info_intro">{{shop_intro}}</div>
-        <div class="shopMain_top_info_tips"><span style="background: #0091ff;padding: 0 2px;border-radius: 3px;">{{shop_tips}}</span></div>
+        <div class="shopMain_top_info_name">{{shopInfo.shop_name}}</div>
+        <div class="shopMain_top_info_intro">{{shopInfo.shop_intro}}</div>
+        <div class="shopMain_top_info_tips"><span style="background: #0091ff;padding: 0 2px;border-radius: 3px;">{{shopInfo.shop_tips}}</span></div>
       </div>
     </div>
     <div class="shopMain_sales" @click="toggleType">
-      <div class="shopMain_sales_line" v-for="(item, key) in salesList" :key="item.id" v-if="(key !== 0 && pullDown) || (key === 0)">
+      <div class="shopMain_sales_line" v-for="(item, key) in shopInfo.salesList" :key="item.id" v-if="(key !== 0 && pullDown) || (key === 0)">
         <div class="shopMain_sales_line_detail" >{{item.name}}</div>
-        <div :class="button_type" v-if="key === 0" >{{salesList.length}}个活动</div>
+        <div :class="button_type" v-if="key === 0" >{{shopInfo.salesList.length}}个活动</div>
       </div>
     </div>
     <div class="shopMain_list">
       <div class="shopMain_list_title">商品</div>
+      <div class="shopMain_list_title" style="color: #333333;border-bottom: 0;" @click="$router.push({name: 'orderList'})">订单</div>
       <div class="shopMain_list_total" ref="list_frame">
         <div class="shopMain_list_total_kind">
           <div v-for="(item, key) in kindList" :key="item.type" :class="'kind_item ' + (key === chosenKind ? 'chosen' : '')" @click="chosenKind = key">
@@ -88,11 +89,22 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import { Popup, Badge, PaletteButton } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
+    this.setShopInfo({
+      shop_name: '店铺名称店铺名称',
+      shop_intro: '店铺介绍信息',
+      shop_tips: '店铺提示信息',
+      salesList: [
+        {id: '1', name: '满20减12', gate: 20, reduce: 12},
+        {id: '2', name: '满100减20', gate: 100, reduce: 20},
+        {id: '3', name: '满500减100', gate: 500, reduce: 100},
+        {id: '4', name: '满1000减200', gate: 1000, reduce: 200}
+      ]
+    })
     this.resizeList()
     this.getCurrentMenuList(0)
     var lastMenu = window.localStorage.getItem('yjiatech_menu')
@@ -129,17 +141,8 @@ export default {
       totalAmount: 0,
       salesTips: '',
       salesTips2: '',
-      shop_name: '店铺名称店铺名称',
-      shop_intro: '店铺介绍信息',
-      shop_tips: '店铺提示信息',
       defaultImg: require('../assets/default_log.png'),
       shopMain_list_bottom_line2_background: '',
-      salesList: [
-        {id: '1', name: '满20减12', gate: 20, reduce: 12},
-        {id: '2', name: '满100减20', gate: 100, reduce: 20},
-        {id: '3', name: '满500减100', gate: 500, reduce: 100},
-        {id: '4', name: '满1000减200', gate: 1000, reduce: 200}
-      ],
       kindList: [
         {type: '1', name: '热销', count: 0},
         {type: '2', name: '优惠', count: 0},
@@ -178,6 +181,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters([
+      'shopInfo'
+    ]),
     button_type () {
       return this.pullDown ? 'shopMain_sales_line_button2' : 'shopMain_sales_line_button1'
     },
@@ -193,7 +199,8 @@ export default {
   },
   methods: {
     ...mapActions([
-      'setUserInfo'
+      'setOrderInfo',
+      'setShopInfo'
     ]),
     toggleType () {
       this.pullDown = !this.pullDown
@@ -277,7 +284,7 @@ export default {
       var flag = false
       var salesTips = ''
       var salesTips2 = ''
-      this.salesList.forEach((val) => {
+      this.shopInfo.salesList.forEach((val) => {
         if (val.gate <= tmpTotalAmount) {
           flag = true
           salesTips = val.gate
@@ -293,7 +300,7 @@ export default {
         this.$refs.list_frame.style.paddingBottom = '76px'
       }
       window.localStorage.setItem('yjiatech_menu', JSON.stringify(newVal))
-      this.setUserInfo({order: newVal, discount: salesTips2})
+      this.setOrderInfo({order: newVal, discount: salesTips2})
     },
     chosenKind (newVal) {
       this.getCurrentMenuList(newVal)
@@ -397,6 +404,7 @@ export default {
     border-top: 1px solid #F8F8F8;
   }
   .shopMain_list_title {
+    display: inline-block;
     width: 14%;
     padding: 10px 0;
     text-align: center;

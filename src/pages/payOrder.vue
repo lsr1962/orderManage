@@ -8,7 +8,7 @@
         </div>
         <div class="pay_order_name">
           <div class="pay_order_name_text">{{shop_name}}</div>
-          <div class="pay_order_name_amount"><span class="unit">￥</span>{{userInfo.totalAmount}}</div>
+          <div class="pay_order_name_amount"><span class="unit">￥</span>{{orderInfo.totalAmount}}</div>
         </div>
       </div>
       <div class="choose_method">
@@ -26,7 +26,7 @@
       </div>
     </div>
     <div class="shopMain_list_bottom_line2" @click="pay">
-      <div class="shopMain_list_bottom_pay">确认支付<span class="unit">￥</span>{{userInfo.totalAmount}}</div>
+      <div class="shopMain_list_bottom_pay">确认支付<span class="unit">￥</span>{{orderInfo.totalAmount}}</div>
     </div>
   </div>
 </template>
@@ -36,7 +36,7 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'shopMain',
   mounted () {
-    if (this.userInfo.orderId) {
+    if (this.orderInfo.orderId) {
 
     } else {
       this.$router.push({name: 'shopMain'})
@@ -71,7 +71,7 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'userInfo'
+      'orderInfo'
     ])
   },
   methods: {
