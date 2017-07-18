@@ -31,6 +31,10 @@
           <div class="order_acount"></div>
           <div class="order_amount total_amount"><span class="unit2">小计￥</span><span class="total_amount">{{totalAmount}}</span></div>
         </div>
+        <div class="lucky_money_line total_line mark_line">
+          <div class="discount_detail">备注</div>
+          <textarea v-model="mark" class="mark_input" rows="4" placeholder="请填写您的其他要求……"></textarea>
+        </div>
       </div>
     </div>
     <div class="shopMain_list_bottom_line2">
@@ -55,8 +59,10 @@
         <div class="luckyMoney_count_detail">红包说明</div>
       </div>
       <div v-for="(item, key) in luckyMoneyList" class="luckyMoney_list luckyMoney_main no_select" :class="{isSelect: (key === luckyIndex)}" @click="chooseLukyMoney(item, key)">
-        <div class="order_name" style="width: 25%;text-align: center;"><span class="unit">￥</span>{{item.amount}}</div>
-        <div class="order_acount" style="width: 50%;text-align: left;"><div>{{item.name}}</div><div>{{item.startTime}}-{{item.endTime}}</div></div>
+        <div class="order_name" style="width: 30%;text-align: center;color: #ff0034;font-size: 25px;"><span class="unit">￥</span>{{item.amount}}</div>
+        <div class="order_acount" style="width: 60%;text-align: left;">
+          <div style="color: #333333;font-weight: bold;">{{item.name}}</div>
+          <div style="color: #666666;font-size: 12px;padding-top: 5px;">{{item.startTime}}至{{item.endTime}}</div></div>
         <div class="order_amount"></div>
       </div>
     </mt-popup>
@@ -64,12 +70,17 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { Popup, Header } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
-    this.list = this.$route.params.order
-    this.discount = this.$route.params.discount
+    if (this.userInfo.order.length > 0) {
+      this.list = this.userInfo.order
+      this.discount = this.userInfo.discount
+    } else {
+      this.$router.push({name: 'shopMain'})
+    }
     this.luckyMoneyList.forEach((val, key) => {
       if ((new Date(val.startTime) > new Date()) || (new Date(val.endTime) < new Date())) {
         this.luckyMoneyList.splice(key, 1)
@@ -92,13 +103,23 @@ export default {
         {name: '超级会员专享', amount: 5, startTime: '2017-06-01', endTime: '2017-08-31'},
         {name: '超级会员专享', amount: 20, startTime: '2017-06-01', endTime: '2017-07-01'}
       ],
+      salesList: [
+        {id: '1', name: '满20减12', gate: 20, reduce: 12},
+        {id: '2', name: '满100减20', gate: 100, reduce: 20},
+        {id: '3', name: '满500减100', gate: 500, reduce: 100},
+        {id: '4', name: '满1000减200', gate: 1000, reduce: 200}
+      ],
       discount: 0,
       luckyIndex: -1,
       luckyMoney: 0,
-      luckyMoneyText: ''
+      luckyMoneyText: '',
+      mark: ''
     }
   },
   computed: {
+    ...mapGetters([
+      'userInfo'
+    ]),
     totalAmount () {
       var tmpTotalAmount = 0
       this.list.forEach((val) => {
@@ -108,6 +129,7 @@ export default {
       if (tmpTotalAmount < 0) {
         tmpTotalAmount = 0
       }
+      this.userInfo.totalAmount = tmpTotalAmount
       return tmpTotalAmount
     }
   },
@@ -125,9 +147,15 @@ export default {
         this.luckyMoneyText = item.name
       }
     },
-    pay () {}
+    pay () {
+      this.userInfo.orderId = '00001'
+      this.$router.push({name: 'payOrder'})
+    }
   },
   watch: {
+    mark (newVal) {
+      this.userInfo.mark = newVal
+    }
   }
 }
 </script>
@@ -137,7 +165,7 @@ export default {
   .order_confirm {
     background: #F5F5F5;
     padding: 10px 8px;
-    padding-bottom: 48px;
+    padding-bottom: 58px;
   }
   .order_confirm_top {
     background: #ffffff;
@@ -223,7 +251,13 @@ export default {
     width: 70%;
   }
   .total_line {
+    border-top: 0;
+  }
+  .mark_line {
     border: 0;
+    padding: 5px 0;
+    min-height: 50px;
+    height: auto;
   }
   .discount_detail {
     font-size: 12px;
@@ -240,6 +274,9 @@ export default {
     background: #F5F5F5;
   }
   .no_luckyMoney {
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    font-size: 15px;
     margin: 10px 8px;
     height: 40px;
     background: #ffffff;
@@ -271,7 +308,8 @@ export default {
     justify-content: space-between;
     align-items: center;
     height: 92px;
-    padding: 0 15px;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
   }
   .luckyMoneyText {
     height: 120%;
@@ -336,5 +374,11 @@ export default {
     background: #ffffff url('../assets/packet_radio@3x.png') no-repeat right;
     background-size: 24px 24px;
     background-position-x: 98%;
+  }
+  .mark_input {
+    width: 70%;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    padding: 5px 5px;
   }
 </style>

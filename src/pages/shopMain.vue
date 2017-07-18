@@ -88,6 +88,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import { Popup, Badge, PaletteButton } from 'mint-ui'
 export default {
   name: 'shopMain',
@@ -101,6 +102,11 @@ export default {
           this.allMenuList.forEach((val) => {
             if (val.id === item.id) {
               val.count = item.count
+            }
+          })
+          this.kindList.forEach((val) => {
+            if (val.type === item.kind) {
+              val.count += item.count
             }
           })
         })
@@ -186,6 +192,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions([
+      'setUserInfo'
+    ]),
     toggleType () {
       this.pullDown = !this.pullDown
       this.$nextTick(() => {
@@ -214,12 +223,16 @@ export default {
       } else {
         this.allMenuList.forEach((val) => {
           if (val.id === item.id) {
-            val.count --
+            if (val.count > 0) {
+              val.count--
+            }
           }
         })
         this.kindList.forEach((val) => {
           if (val.type === item.kind) {
-            val.count --
+            if (val.count > 0) {
+              val.count--
+            }
           }
         })
       }
@@ -242,8 +255,7 @@ export default {
       })
     },
     pay () {
-      window.localStorage.setItem('yjiatech_menu', JSON.stringify(this.selected_menu))
-      this.$router.push({name: 'confirmOrder', params: {order: this.selected_menu, discount: this.salesTips2}})
+      this.$router.push({name: 'confirmOrder'})
     }
   },
   watch: {
@@ -263,19 +275,25 @@ export default {
         this.shopMain_list_bottom_line2_background = '#1b251f'
       }
       var flag = false
+      var salesTips = ''
+      var salesTips2 = ''
       this.salesList.forEach((val) => {
         if (val.gate <= tmpTotalAmount) {
           flag = true
-          this.salesTips = val.gate
-          this.salesTips2 = val.reduce
+          salesTips = val.gate
+          salesTips2 = val.reduce
         }
       })
+      this.salesTips = salesTips
+      this.salesTips2 = salesTips2
       if (!flag) {
         this.salesTips = ''
         this.$refs.list_frame.style.paddingBottom = '48px'
       } else {
         this.$refs.list_frame.style.paddingBottom = '76px'
       }
+      window.localStorage.setItem('yjiatech_menu', JSON.stringify(newVal))
+      this.setUserInfo({order: newVal, discount: salesTips2})
     },
     chosenKind (newVal) {
       this.getCurrentMenuList(newVal)

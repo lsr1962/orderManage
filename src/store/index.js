@@ -15,10 +15,12 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     userInfo: {
-      userid: '3',
-      useradmin: '1',
-      shopid: '2',
-      telephone: '18656132832'
+      order: [],
+      discount: 0,
+      luckyMoney: 0,
+      mark: '',
+      totalAmount: '',
+      orderId: ''
     }
   },
   mutations: {
