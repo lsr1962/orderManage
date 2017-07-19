@@ -628,6 +628,7 @@ export default {
   }
   .menu_item_left_img {
     width: 100%;
+    max-height: 100%;
   }
   .menu_item_right {
     width: 70%;

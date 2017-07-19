@@ -14,6 +14,7 @@
         <div class="order_list_item_content_name_gotoPay" v-if="item.status === 0" @click.stop="repay(item)">去支付</div>
       </div>
     </div>
+    <div class="no_order" v-if="list.length === 0">没有订单信息，快去下单吧！</div>
   </div>
 </template>
 
@@ -172,5 +173,11 @@ export default {
     border: 1px solid #ff6952;
     color: #ff5339;
     border-radius: 5px;
+  }
+  .no_order {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
   }
 </style>

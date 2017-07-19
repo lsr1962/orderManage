@@ -5,9 +5,10 @@
         <img style="height: 100%;" src="../assets/markbg@2x.png"/>
       </div>
       <div class="finish_tips">准时达订单</div>
-      <div class="finish_tips2">订单已准时送达，感谢您使用准时达服务</div>
-      <div class="finish_tips3">订单已完成</div>
-
+      <div v-if="orderItem.status === 0" class="finish_tips2">订单尚未支付</div>
+      <div v-else class="finish_tips2">订单已准时送达，感谢您使用准时达服务</div>
+      <div v-if="orderItem.status === 0" class="order_list_item_content_name_gotoPay" @click="repay(orderItem)">去支付</div>
+      <div v-else class="finish_tips3">订单已完成</div>
       <div class="finish_luckyMoney">发红包</div>
     </div>
     <div class="detail_content">
@@ -37,10 +38,10 @@
         <div class="lucky_money_line total_line">
           <div class="discount_detail discount_icon"></div>
           <div class="order_acount"></div>
-          <div class="order_amount total_amount"><span class="unit2">实付￥</span><span class="total_amount">{{orderItem.totalAmount}}</span></div>
+          <div class="order_amount total_amount"><span class="unit2">{{(orderItem.status === 0 ? '小计' : '实付')}}￥</span><span class="total_amount">{{orderItem.totalAmount}}</span></div>
         </div>
       </div>
-      <div class="detail_content_order">
+      <div class="detail_content_order" v-if="orderItem.status !== 0">
         <div class="order_info_title">订单信息</div>
         <div class="order_info_line">
           <div class="order_info_line_title">订单号</div>
@@ -299,5 +300,12 @@ export default {
   .order_info_line_text {
     font-size: 13px;
     color: #666666;
+  }
+  .order_list_item_content_name_gotoPay {
+    padding: 5px 10px;
+    border: 1px solid #ff6952;
+    color: #ff5339;
+    border-radius: 5px;
+    margin-top: 15px;
   }
 </style>
