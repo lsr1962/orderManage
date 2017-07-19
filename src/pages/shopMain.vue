@@ -17,8 +17,10 @@
       </div>
     </div>
     <div class="shopMain_list">
-      <div class="shopMain_list_title">商品</div>
-      <div class="shopMain_list_title" style="color: #333333;border-bottom: 0;" @click="$router.push({name: 'orderList'})">订单</div>
+      <div class="shopMain_list_title_line">
+        <div class="shopMain_list_title">商品</div>
+        <div class="shopMain_list_order" @click="$router.push({name: 'orderList'})">查看订单</div>
+      </div>
       <div class="shopMain_list_total" ref="list_frame">
         <div class="shopMain_list_total_kind">
           <div v-for="(item, key) in kindList" :key="item.type" :class="'kind_item ' + (key === chosenKind ? 'chosen' : '')" @click="chosenKind = key">
@@ -30,7 +32,7 @@
         <div class="shopMain_list_total_menu">
           <div class="shopMain_list_total_menu_title">{{kindList[chosenKind].name}}</div>
           <div v-for="(item, key) in menuList" :key="item.id" class="menu_item">
-            <div class="menu_item_left">
+            <div class="menu_item_left" @click="displayItem(item)">
               <img class="menu_item_left_img" :src="item.img || defaultImg"/>
             </div>
             <div class="menu_item_right">
@@ -64,6 +66,12 @@
         </template>
       </div>
     </div>
+    <mt-popup
+      v-model="chooseItem"
+      class="chooseItem"
+      >
+      <img style="width: 100%" :src="largeItem">
+    </mt-popup>
     <mt-popup
       v-model="popupVisible"
       class="selected_detail"
@@ -105,7 +113,6 @@ export default {
         {id: '4', name: '满1000减200', gate: 1000, reduce: 200}
       ]
     })
-    this.resizeList()
     this.getCurrentMenuList(0)
     var lastMenu = window.localStorage.getItem('yjiatech_menu')
     if (lastMenu) {
@@ -126,6 +133,9 @@ export default {
 
       }
     }
+    this.$nextTick(() => {
+      this.resizeList()
+    })
   },
   components: {
     [PaletteButton.name]: PaletteButton,
@@ -136,12 +146,14 @@ export default {
     return {
       pullDown: false,
       popupVisible: false,
+      chooseItem: false,
+      largeItem: '',
       chosenKind: 0,
       totalCount: 0,
       totalAmount: 0,
       salesTips: '',
       salesTips2: '',
-      defaultImg: require('../assets/default_log.png'),
+      defaultImg: require('../assets/markbg@2x.png'),
       shopMain_list_bottom_line2_background: '',
       kindList: [
         {type: '1', name: '热销', count: 0},
@@ -263,6 +275,10 @@ export default {
     },
     pay () {
       this.$router.push({name: 'confirmOrder'})
+    },
+    displayItem (item) {
+      this.chooseItem = true
+      this.largeItem = item.img || this.defaultImg
     }
   },
   watch: {
@@ -403,8 +419,10 @@ export default {
     padding-bottom: 50px;
     border-top: 1px solid #F8F8F8;
   }
+  .shopMain_list_title_line {
+    display: flex;
+  }
   .shopMain_list_title {
-    display: inline-block;
     width: 14%;
     padding: 10px 0;
     text-align: center;
@@ -412,6 +430,17 @@ export default {
     color: #2395ff;
     margin: 0 8%;
     border-bottom: 2px solid;
+  }
+  .shopMain_list_order {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    padding: 0 5px;
+    font-size: 15px;
+    margin: 10px;
+    border: 1px solid #ff6952;
+    border-radius: 5px;
+    color: #ff5339;
   }
   .shopMain_list_total_kind {
     width: 30%;
@@ -725,5 +754,12 @@ export default {
   .bottom_detail_tips {
     background: #ECECEE;
     height: 15px;
+  }
+  .chooseItem {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 </style>

@@ -75,7 +75,7 @@ import { Popup, Header } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
-    if (this.orderInfo.order.length > 0) {
+    if (this.orderInfo.order) {
       this.list = this.orderInfo.order
       this.discount = this.orderInfo.discount
     } else {

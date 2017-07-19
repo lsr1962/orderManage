@@ -36,7 +36,7 @@ export default {
   name: 'shopMain',
   mounted () {
     if (this.orderInfo.orderId) {
-      this.setOrderInfo({order: []})
+      this.setOrderInfo({})
     } else {
       this.$router.push({name: 'shopMain'})
     }

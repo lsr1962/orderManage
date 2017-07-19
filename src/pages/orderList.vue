@@ -2,16 +2,16 @@
   <div class="order_list" ref="order_list">
     <div v-for="(item, key) in list" class="order_list_item">
       <img class="order_list_item_icon" :src="item.img || defaultImg" />
-      <div class="order_list_item_content">
-        <div class="order_list_item_content_name" @click="$router.push({name: 'shopMain'})">
-          <div class="order_list_item_content_name_text">{{shopInfo.shop_name}}</div>
+      <div class="order_list_item_content" @click="gotoDetail(item)">
+        <div class="order_list_item_content_name">
+          <div class="order_list_item_content_name_text" @click.stop="gotoMain">{{shopInfo.shop_name}}</div>
           <div class="order_list_item_content_name_pay" v-if="item.status === 0">去支付</div>
           <div class="order_list_item_content_name_finish" v-else>订单已完成</div>
         </div>
         <div class="order_list_item_content_time">{{item.pay_time}}</div>
         <div class="order_list_item_content_detail">{{item.order[0].name}}&nbsp;&nbsp;等{{item.order.length}}个菜品</div>
         <div class="order_list_item_content_amount">{{item.totalAmount}}</div>
-        <div class="order_list_item_content_name_gotoPay" v-if="item.status === 0" @click="repay(item)">去支付</div>
+        <div class="order_list_item_content_name_gotoPay" v-if="item.status === 0" @click.stop="repay(item)">去支付</div>
       </div>
     </div>
   </div>
@@ -40,10 +40,12 @@ export default {
           ],
           totalAmount: 155,
           discount: 20,
+          luckyMoneyText: '超级会员专享',
           luckyMoney: 15,
           mark: '不要辣椒',
           pay_time: '2017-07-11',
           orderId: '1',
+          payType: '微信支付',
           status: 0
         },
         {
@@ -54,10 +56,12 @@ export default {
           ],
           totalAmount: 77,
           discount: 12,
+          luckyMoneyText: '超级会员专享',
           luckyMoney: 5,
           mark: '少盐少油',
           pay_time: '2017-07-18',
           orderId: '1',
+          payType: '支付宝支付',
           status: 1
         }
       ]
@@ -93,6 +97,12 @@ export default {
       this.orderInfo.orderId = item.orderId
       this.orderInfo.totalAmount = item.totalAmount
       this.$router.push({name: 'payOrder'})
+    },
+    gotoMain () {
+      this.$router.push({name: 'shopMain'})
+    },
+    gotoDetail (item) {
+      this.$router.push({name: 'orderDetail', params: {item: item}})
     }
   },
   watch: {
