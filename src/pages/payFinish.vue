@@ -5,25 +5,22 @@
         <div style="color: #333333;font-size: 18px;font-weight: bold;">{{finish_time}}</div>
         <div style="color: #999999;font-size: 10px;">下单时间</div>
       </div>
-      <div class="finish_tips">准时达订单</div>
-      <div class="finish_tips2">{{deadline_time}}前未送达，可获得赔付</div>
-      <div class="finish_tips3">商家正在备货</div>
+      <div class="finish_tips">{{tags}}</div>
+      <div class="finish_tips2">{{text}}</div>
+      <div class="finish_tips3">{{name}}</div>
       <div class="finish_buttons">
         <div class="finish_button left" @click="$router.push({name: 'orderList'})">查看订单</div>
         <div class="finish_button right" @click="$router.push({name: 'shopMain'})">商家首页</div>
       </div>
-      <div class="finish_luckyMoney">发红包</div>
-    </div>
-    <div class="AD">
-      <img class="AD_img" src="../assets/markbg@2x.png">
+      <div class="finish_luckyMoney" v-if="shareList.isShare === '0'">发红包</div>
     </div>
     <mt-popup
       v-model="popupVisible"
       class="luckyMoney_popup"
       popup-transition="popup-fade">
-      <div class="luckyMoney_popup_title">恭喜获得商家代金券</div>
-      <div class="luckyMoney_popup_amount"><span class="unit">￥</span>{{luckyMoney_amount}}</div>
-      <div class="luckyMoney_popup_tips">{{luckyMoney_text}}</div>
+      <div class="luckyMoney_popup_title">{{couponList.title}}</div>
+      <div class="luckyMoney_popup_amount"><span class="unit">￥</span>{{couponList.money}}</div>
+      <div class="luckyMoney_popup_tips">{{couponList.name}}</div>
       <div class="luckyMoney_popup_button" @click="popupVisible = false">好的</div>
     </mt-popup>
   </div>
@@ -31,12 +28,41 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import { Popup } from 'mint-ui'
+import { Popup, Toast } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
-    if (this.$route.query.code) {
-
+    if (this.$route.query.OrderId && !this.userInfo.openid) {
+      this.query_params = this.$route.query
+      this.setUserInfo({
+        wid: this.$route.query.wid,
+        shopid: this.$route.query.shopid,
+        qrGID: this.$route.query.qrGID,
+        openid: this.$route.query.openid
+      })
+      this.$http.post('/notify/payFinish.html', {
+        data: this.userInfo,
+        order: {
+          OrderId: this.$route.query.OrderId
+        }
+      }).then((data) => {
+        var result = data.data
+        if (parseInt(result.errcode) !== 0) {
+          Toast(result.errmsg)
+          return
+        }
+        this.finish_time = result.orderList.payTime
+        this.tags = result.orderList.tags
+        this.text = result.orderList.text
+        this.name = result.orderList.name
+        this.couponList = result.couponList
+        this.shareList = result.shareList
+        if (result.couponList !== {}) {
+          this.popupVisible = true
+        }
+      }).catch((e) => {
+        console.log(e)
+      })
     } else {
       this.$router.push({name: 'shopMain'})
     }
@@ -47,21 +73,24 @@ export default {
   },
   data () {
     return {
-      popupVisible: true,
-      finish_time: this.dateFormat(new Date(), 'hh:mm'),
-      deadline_time: this.dateFormat(new Date(new Date().setMinutes(new Date().getMinutes() + 15)), 'hh:mm'),
-      luckyMoney_amount: 10,
-      luckyMoney_text: '限金百万烤鸭(丽泽路店)使用'
+      popupVisible: false,
+      finish_time: '',
+      tags: '',
+      text: '',
+      name: '',
+      couponList: {},
+      shareList: {},
+      query_params: {}
     }
   },
   computed: {
     ...mapGetters([
-      'orderInfo'
+      'userInfo'
     ])
   },
   methods: {
     ...mapActions([
-      'setOrderInfo'
+      'setUserInfo'
     ]),
     dateFormat (value, fmt) {
       var o = {
@@ -142,6 +171,7 @@ export default {
     display: flex;
     align-items: center;
     margin-top: 20px;
+    margin-bottom: 24px;
   }
   .finish_button {
     width: 105px;
@@ -165,7 +195,7 @@ export default {
     background-size: 16px 16px;
     background-position-x: 5%;
     font-size: 10px;
-    margin-top: 24px;
+
     margin-bottom: 12px;
     padding: 5px;
     padding-left: 25px;

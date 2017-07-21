@@ -26,7 +26,7 @@
       </div>
     </div>
     <div class="shopMain_list_bottom_line2" @click="pay">
-      <div class="shopMain_list_bottom_pay" ref="pay_display">确认支付<span class="unit">￥</span>{{orderInfo.totalAmount}}</div>
+      <div class="shopMain_list_bottom_pay" ref="pay_display">确认支付<span class="unit">￥</span>{{orderInfo.orderList.TradeAmount}}</div>
     </div>
   </div>
 </template>
@@ -64,11 +64,7 @@ export default {
       now_time: '',
       remain_time: '',
       shop_name: '店铺名称店铺名称',
-      pay_method_list: [
-        {name: '微信', img: require('../assets/ico_weixinzhifu@1x.png'), payType: 1},
-        {name: '支付宝', img: require('../assets/ico_zhifubao@1x.png'), payType: 2}
-      ],
-      pullDown: false,
+      pullDown: true,
       payIndex: 0
     }
   },
@@ -77,12 +73,33 @@ export default {
       'userInfo',
       'shopInfo',
       'orderInfo'
-    ])
+    ]),
+    pay_method_list () {
+      if (this.isWeiXin() === 'wx') {
+        return [
+          {name: '微信', img: require('../assets/ico_weixinzhifu@1x.png'), payType: 1}
+        ]
+      } else {
+        return [
+          {name: '支付宝', img: require('../assets/ico_zhifubao@1x.png'), payType: 2}
+        ]
+      }
+    }
   },
   methods: {
     ...mapActions([
       'setOrderInfo'
     ]),
+    isWeiXin () {
+      var ua = window.navigator.userAgent.toLowerCase()
+      if (ua.match(/MicroMessenger/i) + '' === 'micromessenger') {
+        return 'wx'
+      } else if (ua.match(/Alipay/i) + '' === 'alipay') {
+        return 'alipay'
+      } else {
+        return 'wap'
+      }
+    },
     dateFormat (value, fmt) {
       var o = {
         'M+': value.getMonth() + 1, // 月份

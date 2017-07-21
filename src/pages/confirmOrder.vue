@@ -142,6 +142,7 @@ export default {
         this.list.forEach((val) => {
           tmpTotalAmount += (val.count * (val.price * 100))
         })
+        tmpTotalAmount = tmpTotalAmount / 100
         this.luckyMoneyList.forEach((val, key) => {
           if (tmpTotalAmount < val.gate) {
             this.luckyMoneyList.splice(key, 1)

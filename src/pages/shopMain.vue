@@ -117,6 +117,12 @@ import { Popup, Badge, PaletteButton, Toast } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
+    this.setUserInfo({
+      wid: '21',
+      shopid: '2',
+      qrGID: 'UFI=-UA==-U1EJ',
+      openid: 'ow5uyv8rECDpJ26hTlfH1gQqbwr8'
+    })
     if (this.userInfo.openid) {
       this.$http.post('/main/get.html', {data: this.userInfo}).then((data) => {
         var result = data.data
@@ -297,7 +303,7 @@ export default {
       var salesType = ''
       var salesTips = ''
       var salesTips2 = 0
-      var salesItem = {}
+      var salesItem = {reduce: 0}
       this.shopInfo.salesList.forEach((val) => {
         if ((parseFloat(val.gate) <= tmpTotalAmount) && (salesTips2 < parseFloat(val.reduce)) && ((val.type === 1) || (val.type === 3))) {
           flag = true
