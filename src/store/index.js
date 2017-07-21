@@ -14,7 +14,12 @@ export default new Vuex.Store({
   state: {
     orderInfo: {},
     shopInfo: {},
-    userInfo: {}
+    userInfo: {
+      wid: '21',
+      shopid: '2',
+      qrGID: 'UFI=-UA==-U1EJ',
+      openid: 'ow5uyv8rECDpJ26hTlfH1gQqbwr8'
+    }
   },
   mutations: {
     [types.SET_USER_INFO] (state, userInfo) {

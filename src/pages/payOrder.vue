@@ -4,11 +4,11 @@
       <div class="pay_order_top_section">
         <div class="pay_order_top">
           <div class="pay_order_top_text">支付剩余时间</div>
-          <div class="pay_order_top_time">{{remain_time}}</div>
+          <div class="pay_order_top_time" ref="remain_time">{{remain_time}}</div>
         </div>
         <div class="pay_order_name">
-          <div class="pay_order_name_text">{{shop_name}}</div>
-          <div class="pay_order_name_amount"><span class="unit">￥</span>{{orderInfo.totalAmount}}</div>
+          <div class="pay_order_name_text">{{shopInfo.name}}</div>
+          <div class="pay_order_name_amount"><span class="unit">￥</span>{{orderInfo.orderList.TradeAmount}}</div>
         </div>
       </div>
       <div class="choose_method">
@@ -26,29 +26,33 @@
       </div>
     </div>
     <div class="shopMain_list_bottom_line2" @click="pay">
-      <div class="shopMain_list_bottom_pay">确认支付<span class="unit">￥</span>{{orderInfo.totalAmount}}</div>
+      <div class="shopMain_list_bottom_pay" ref="pay_display">确认支付<span class="unit">￥</span>{{orderInfo.totalAmount}}</div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions, Toast } from 'vuex'
 export default {
   name: 'shopMain',
   mounted () {
-    if (this.orderInfo.orderId) {
-
+    if (this.orderInfo.orderList) {
+      this.now_time = new Date(this.orderInfo.orderList.startTime)
+      var intervalFun = () => {
+        this.now_time = new Date(this.now_time.setSeconds(this.now_time.getSeconds() + 1))
+        this.remain_time = this.dateFormat(new Date(new Date(this.orderInfo.orderList.endTime).getTime() - this.now_time.getTime()), 'mm:ss')
+        if (this.remain_time === '00:00') {
+          this.$refs.pay_display.innerHTML = '重新下单'
+          this.$refs.pay_display.style.background = '#595959'
+          this.$refs.remain_time.innerHTML = '订单已关闭'
+          window.clearInterval(this.timer)
+        }
+      }
+      intervalFun()
+      this.timer = window.setInterval(intervalFun, 1000)
     } else {
       this.$router.push({name: 'shopMain'})
     }
-    var intervalFun = () => {
-      this.remain_time = this.dateFormat(new Date(this.deadLine.getTime() - new Date().getTime()), 'mm:ss')
-      if (this.remain_time === '00:00') {
-        window.clearInterval(this.timer)
-      }
-    }
-    intervalFun()
-    this.timer = window.setInterval(intervalFun, 1000)
     this.$refs.pay_order.style.height = (document.documentElement.clientHeight - this.$refs.pay_order.getBoundingClientRect().top) + 'px'
     this.$refs.pay_order.style.overflow = 'auto'
   },
@@ -57,13 +61,12 @@ export default {
   data () {
     return {
       timer: '',
+      now_time: '',
       remain_time: '',
-      deadLine: new Date(new Date().setMinutes(new Date().getMinutes() + 15)),
       shop_name: '店铺名称店铺名称',
       pay_method_list: [
-        {name: '微信', img: require('../assets/ico_weixinzhifu@1x.png')},
-        {name: '支付宝', img: require('../assets/ico_zhifubao@1x.png')},
-        {name: 'QQ钱包', img: require('../assets/ico_QQ@1x.png')}
+        {name: '微信', img: require('../assets/ico_weixinzhifu@1x.png'), payType: 1},
+        {name: '支付宝', img: require('../assets/ico_zhifubao@1x.png'), payType: 2}
       ],
       pullDown: false,
       payIndex: 0
@@ -71,10 +74,15 @@ export default {
   },
   computed: {
     ...mapGetters([
+      'userInfo',
+      'shopInfo',
       'orderInfo'
     ])
   },
   methods: {
+    ...mapActions([
+      'setOrderInfo'
+    ]),
     dateFormat (value, fmt) {
       var o = {
         'M+': value.getMonth() + 1, // 月份
@@ -95,8 +103,29 @@ export default {
       this.payIndex = key
     },
     pay () {
-      window.localStorage.setItem('yjiatech_menu', JSON.stringify([]))
-      this.$router.push({name: 'payFinish'})
+      if (this.remain_time === '00:00') {
+        this.$router.push({name: 'shopMain'})
+      } else {
+        this.$http.post('/order/doPay.html', {
+          data: this.userInfo,
+          order: {
+            OrderId: this.orderInfo.orderList.OrderId,
+            OrderNo: this.orderInfo.orderList.OrderNo,
+            payType: this.pay_method_list[this.payIndex].payType
+          }
+        }).then((data) => {
+          var result = data.data
+          if (parseInt(result.errcode) !== 0) {
+            Toast(result.errmsg)
+            return
+          }
+          window.localStorage.setItem('yjiatech_menu', JSON.stringify([]))
+          this.setOrderInfo({})
+          window.location.href = result.pay_url
+        }).catch((e) => {
+          console.log(e)
+        })
+      }
     }
   },
   watch: {

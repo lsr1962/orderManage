@@ -23,7 +23,7 @@
       popup-transition="popup-fade">
       <div class="luckyMoney_popup_title">恭喜获得商家代金券</div>
       <div class="luckyMoney_popup_amount"><span class="unit">￥</span>{{luckyMoney_amount}}</div>
-      <div class="luckyMoney_popup_tips">限金百万烤鸭(丽泽路店)使用</div>
+      <div class="luckyMoney_popup_tips">{{luckyMoney_text}}</div>
       <div class="luckyMoney_popup_button" @click="popupVisible = false">好的</div>
     </mt-popup>
   </div>
@@ -35,8 +35,8 @@ import { Popup } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
-    if (this.orderInfo.orderId) {
-      this.setOrderInfo({})
+    if (this.$route.query.code) {
+
     } else {
       this.$router.push({name: 'shopMain'})
     }
@@ -50,7 +50,8 @@ export default {
       popupVisible: true,
       finish_time: this.dateFormat(new Date(), 'hh:mm'),
       deadline_time: this.dateFormat(new Date(new Date().setMinutes(new Date().getMinutes() + 15)), 'hh:mm'),
-      luckyMoney_amount: 10
+      luckyMoney_amount: 10,
+      luckyMoney_text: '限金百万烤鸭(丽泽路店)使用'
     }
   },
   computed: {

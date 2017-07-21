@@ -2,17 +2,17 @@
   <div class="shopMain">
     <div class="shopMain_top">
       <div class="shopMain_top_icon">
-        <img class="shopMain_top_icon_img" src="../assets/default_log.png">
+        <img class="shopMain_top_icon_img" :src="shopInfo.logo">
       </div>
       <div class="shopMain_top_info">
-        <div class="shopMain_top_info_name">{{shopInfo.shop_name}}</div>
-        <div class="shopMain_top_info_intro">{{shopInfo.shop_intro}}</div>
-        <div class="shopMain_top_info_tips"><span style="background: #0091ff;padding: 0 2px;border-radius: 3px;">{{shopInfo.shop_tips}}</span></div>
+        <div class="shopMain_top_info_name">{{shopInfo.name}}</div>
+        <div class="shopMain_top_info_intro">{{shopInfo.notice}}</div>
+        <div class="shopMain_top_info_tips"><span style="background: #0091ff;padding: 0 2px;border-radius: 3px;">{{shopInfo.tags}}</span></div>
       </div>
     </div>
     <div class="shopMain_sales" @click="toggleType">
       <div class="shopMain_sales_line" v-for="(item, key) in shopInfo.salesList" :key="item.id" v-if="(key !== 0 && pullDown) || (key === 0)">
-        <div class="shopMain_sales_line_detail" >{{item.name}}</div>
+        <div class="shopMain_sales_line_detail" :class="'icon_' + item.type" >{{item.name}}</div>
         <div :class="button_type" v-if="key === 0" >{{shopInfo.salesList.length}}个活动</div>
       </div>
     </div>
@@ -26,7 +26,7 @@
           <div v-for="(item, key) in kindList" :key="item.type" :class="'kind_item ' + (key === chosenKind ? 'chosen' : '')" @click="chosenKind = key">
             {{item.name}}
             <div class="kind_item_line" v-if="(key !== chosenKind) && ((key + 1) !== chosenKind)"></div>
-            <mt-badge class="kind_item_badge" color="red" v-if="item.count > 0" size="small">{{item.count}}</mt-badge>
+            <mt-badge class="kind_item_badge" color="red" v-if="item.count > 0" size="small">{{item.count > 99 ? '99+' : item.count}}</mt-badge>
           </div>
         </div>
         <div class="shopMain_list_total_menu">
@@ -37,6 +37,7 @@
             </div>
             <div class="menu_item_right">
               <div class="menu_item_right_title">{{item.name}}</div>
+              <div class="menu_item_right_tags">{{item.tags}}</div>
               <div class="menu_item_right_line">
                 <div class="menu_item_right_line_left"><span style="font-size: 11px;">￥</span>{{item.price}}</div>
                 <div class="menu_item_right_line_right">
@@ -49,11 +50,18 @@
           </div>
         </div>
       </div>
-      <div class="shopMain_list_bottom_line1" v-if="salesTips">已满{{salesTips}}元，结算减<font style="color: #ff5339">{{salesTips2}}</font>元</div>
+      <div class="shopMain_list_bottom_line1" v-if="salesTips">
+        <template v-if="salesType === 3">
+          新用户首单立减<span style="color: #ff5339">{{salesTips2}}</span>元
+        </template>
+        <template v-else>
+          已满{{salesTips}}元，结算减<span style="color: #ff5339">{{salesTips2}}</span>元
+        </template>
+      </div>
       <div class="shopMain_list_bottom_line2" :style="{background: shopMain_list_bottom_line2_background}">
         <div class="shopMain_list_bottom_icon" @click="selected_menu.length > 0 ? (popupVisible = !popupVisible) : ''">
           <span :class="(selected_menu.length > 0 ? 'kind_item_badge_img' : 'kind_item_badge_img_noSelect')">
-            <mt-badge class="kind_item_badge" style="top: -10px; right: -10px;" color="red" v-if="totalCount > 0" size="small">{{totalCount}}</mt-badge>
+            <mt-badge class="kind_item_badge" style="top: -10px; right: -10px;" color="red" v-if="totalCount > 0" size="small">{{totalCount > 99 ? '99+' : totalCount}}</mt-badge>
           </span>
         </div>
         <template v-if="totalAmount > 0">
@@ -77,7 +85,14 @@
       class="selected_detail"
       position="bottom">
       <div>
-        <div class="shopMain_list_bottom_line3" v-if="salesTips">已满{{salesTips}}元，结算减<span style="color: #ff5339">{{salesTips2}}</span>元</div>
+        <div class="shopMain_list_bottom_line3" v-if="salesTips">
+          <template v-if="salesType === 3">
+            新用户首单立减<span style="color: #ff5339">{{salesTips2}}</span>元
+          </template>
+          <template v-else>
+            已满{{salesTips}}元，结算减<span style="color: #ff5339">{{salesTips2}}</span>元
+          </template>
+        </div>
         <div class="bottom_detail_title">
           <div class="bottom_detail_title_text">已选商品</div>
           <div class="bottom_detail_clear" @click="clear"><img class="bottom_detail_clear_icon" src="../assets/clear.png"/><div class="bottom_detail_clear_text">清空</div></div>
@@ -85,7 +100,7 @@
         <div style="max-height: 270px;overflow: auto;">
           <div v-for="(item, key) in selected_menu" class="bottom_detail_item">
             <div class="bottom_detail_item_name">{{item.name}}</div>
-            <div class="bottom_detail_item_price">￥{{item.price * item.count}}</div>
+            <div class="bottom_detail_item_price">￥{{(item.count * (item.price * 100)) / 100}}</div>
             <div v-if="item.count > 0" class="menu_item_right_line_right_button_del"  @click="modifyCount('del', item)"></div>
             <div v-if="item.count > 0" class="menu_item_right_line_right_count" style="text-align: center;">{{item.count}}</div>
             <div class="menu_item_right_line_right_button" @click="modifyCount('add', item)"></div>
@@ -98,44 +113,53 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import { Popup, Badge, PaletteButton } from 'mint-ui'
+import { Popup, Badge, PaletteButton, Toast } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
-    this.setShopInfo({
-      shop_name: '店铺名称店铺名称',
-      shop_intro: '店铺介绍信息',
-      shop_tips: '店铺提示信息',
-      salesList: [
-        {id: '1', name: '满20减12', gate: 20, reduce: 12},
-        {id: '2', name: '满100减20', gate: 100, reduce: 20},
-        {id: '3', name: '满500减100', gate: 500, reduce: 100},
-        {id: '4', name: '满1000减200', gate: 1000, reduce: 200}
-      ]
-    })
-    this.getCurrentMenuList(0)
-    var lastMenu = window.localStorage.getItem('yjiatech_menu')
-    if (lastMenu) {
-      try {
-        JSON.parse(lastMenu).forEach((item) => {
-          this.allMenuList.forEach((val) => {
-            if (val.id === item.id) {
-              val.count = item.count
-            }
-          })
-          this.kindList.forEach((val) => {
-            if (val.type === item.kind) {
-              val.count += item.count
-            }
-          })
+    if (this.userInfo.openid) {
+      this.$http.post('/main/get.html', {data: this.userInfo}).then((data) => {
+        var result = data.data
+        if (parseInt(result.errcode) !== 0) {
+          Toast(result.errmsg)
+          return
+        }
+        this.setShopInfo({
+          name: result.shopInfo.name,
+          logo: result.shopInfo.logo,
+          notice: result.shopInfo.notice,
+          tags: result.shopInfo.tags,
+          salesList: result.salesList
         })
-      } catch (e) {
+        this.kindList = result.menuList
+        this.allMenuList = result.proList
+        this.getCurrentMenuList(0)
+        var lastMenu = window.localStorage.getItem('yjiatech_menu')
+        if (lastMenu) {
+          try {
+            JSON.parse(lastMenu).forEach((item) => {
+              this.allMenuList.forEach((val) => {
+                if (val.id === item.id) {
+                  val.count = item.count
+                }
+              })
+              this.kindList.forEach((val) => {
+                if (val.type === item.kind) {
+                  val.count += item.count
+                }
+              })
+            })
+          } catch (e) {
 
-      }
+          }
+        }
+        this.$nextTick(() => {
+          this.resizeList()
+        })
+      }).catch((e) => {
+        console.log(e)
+      })
     }
-    this.$nextTick(() => {
-      this.resizeList()
-    })
   },
   components: {
     [PaletteButton.name]: PaletteButton,
@@ -151,49 +175,19 @@ export default {
       chosenKind: 0,
       totalCount: 0,
       totalAmount: 0,
+      salesType: '',
       salesTips: '',
       salesTips2: '',
       defaultImg: require('../assets/markbg@2x.png'),
       shopMain_list_bottom_line2_background: '',
-      kindList: [
-        {type: '1', name: '热销', count: 0},
-        {type: '2', name: '优惠', count: 0},
-        {type: '3', name: '满20减12', count: 0},
-        {type: '4', name: '折扣单品', count: 0},
-        {type: '5', name: '折扣小食', count: 0},
-        {type: '6', name: '折扣套餐', count: 0},
-        {type: '7', name: '热菜', count: 0},
-        {type: '8', name: '凉菜', count: 0},
-        {type: '9', name: '汤粥', count: 0},
-        {type: '10', name: '主食', count: 0},
-        {type: '11', name: '饮料', count: 0}
-      ],
+      kindList: [{name: ''}],
       menuList: [],
-      allMenuList: [
-        {id: '1', kind: '1', name: '热销菜单1', img: '', price: 10, count: 0},
-        {id: '2', kind: '1', name: '热销菜单2', img: '', price: 11, count: 0},
-        {id: '3', kind: '1', name: '热销菜单3', img: '', price: 20, count: 0},
-        {id: '4', kind: '1', name: '热销菜单4', img: '', price: 25, count: 0},
-        {id: '5', kind: '2', name: '优惠菜单5', img: '', price: 100, count: 0},
-        {id: '6', kind: '2', name: '优惠菜单6', img: '', price: 70, count: 0},
-        {id: '7', kind: '3', name: '满20减12菜单7', img: '', price: 45, count: 0},
-        {id: '8', kind: '3', name: '满20减12菜单8', img: '', price: 23, count: 0},
-        {id: '9', kind: '3', name: '满20减12菜单9', img: '', price: 16, count: 0},
-        {id: '10', kind: '3', name: '满20减12菜单10', img: '', price: 87, count: 0},
-        {id: '11', kind: '3', name: '满20减12菜单11', img: '', price: 45, count: 0},
-        {id: '12', kind: '3', name: '满20减12菜单12', img: '', price: 23, count: 0},
-        {id: '13', kind: '3', name: '满20减12菜单13', img: '', price: 16, count: 0},
-        {id: '14', kind: '1', name: '热销菜单14', img: '', price: 87, count: 0},
-        {id: '15', kind: '1', name: '热销菜单15', img: '', price: 87, count: 0},
-        {id: '16', kind: '1', name: '热销菜单16', img: '', price: 45, count: 0},
-        {id: '17', kind: '1', name: '热销菜单17', img: '', price: 23, count: 0},
-        {id: '18', kind: '1', name: '热销菜单18', img: '', price: 16, count: 0},
-        {id: '19', kind: '1', name: '热销菜单19', img: '', price: 87, count: 0}
-      ]
+      allMenuList: []
     }
   },
   computed: {
     ...mapGetters([
+      'userInfo',
       'shopInfo'
     ]),
     button_type () {
@@ -211,8 +205,9 @@ export default {
   },
   methods: {
     ...mapActions([
-      'setOrderInfo',
-      'setShopInfo'
+      'setUserInfo',
+      'setShopInfo',
+      'setOrderInfo'
     ]),
     toggleType () {
       this.pullDown = !this.pullDown
@@ -287,8 +282,9 @@ export default {
       var tmpTotalAmount = 0
       newVal.forEach((val) => {
         tmpTotalCount += val.count
-        tmpTotalAmount += val.count * val.price
+        tmpTotalAmount += (val.count * (val.price * 100))
       })
+      tmpTotalAmount = tmpTotalAmount / 100
       this.totalCount = tmpTotalCount
       this.totalAmount = tmpTotalAmount
       if (newVal.length === 0) {
@@ -298,25 +294,32 @@ export default {
         this.shopMain_list_bottom_line2_background = '#1b251f'
       }
       var flag = false
+      var salesType = ''
       var salesTips = ''
-      var salesTips2 = ''
+      var salesTips2 = 0
+      var salesItem = {}
       this.shopInfo.salesList.forEach((val) => {
-        if (val.gate <= tmpTotalAmount) {
+        if ((parseFloat(val.gate) <= tmpTotalAmount) && (salesTips2 < parseFloat(val.reduce)) && ((val.type === 1) || (val.type === 3))) {
           flag = true
-          salesTips = val.gate
-          salesTips2 = val.reduce
+          salesType = val.type
+          salesTips = parseFloat(val.gate)
+          salesTips2 = parseFloat(val.reduce)
+          salesItem = val
         }
       })
+      this.salesType = salesType
       this.salesTips = salesTips
       this.salesTips2 = salesTips2
-      if (!flag) {
-        this.salesTips = ''
-        this.$refs.list_frame.style.paddingBottom = '48px'
-      } else {
-        this.$refs.list_frame.style.paddingBottom = '76px'
-      }
       window.localStorage.setItem('yjiatech_menu', JSON.stringify(newVal))
-      this.setOrderInfo({order: newVal, discount: salesTips2})
+      this.setOrderInfo({order: newVal, discount: salesItem})
+      this.$nextTick(() => {
+        if (!flag) {
+          this.salesTips = ''
+          this.$refs.list_frame.style.paddingBottom = '48px'
+        } else {
+          this.$refs.list_frame.style.paddingBottom = '76px'
+        }
+      })
     },
     chosenKind (newVal) {
       this.getCurrentMenuList(newVal)
@@ -378,20 +381,41 @@ export default {
   }
   .shopMain_sales_line {
     display: flex;
+    justify-content: space-between;
     padding: 3px 0;
     font-size: 12px;
   }
   .shopMain_sales_line_detail {
-    width: 50%;
-    background: url("../assets/reduce.png") no-repeat;
+    height: 16px;
+    background-image: url("../assets/reduce.png");
+    background-repeat: no-repeat;
     background-position: left;
     background-size: contain;
     padding-left: 25px;
     margin-left: 20px;
     color: #666666;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 70%;
+  }
+  .icon_1 {
+    background-image: url("../assets/jian@2x.png");
+    background-repeat: no-repeat;
+  }
+  .icon_2 {
+    background-image: url("../assets/fan@2x.png");
+    background-repeat: no-repeat;
+  }
+  .icon_3 {
+    background-image: url("../assets/xin@2x.png");
+    background-repeat: no-repeat;
+  }
+  .icon_4 {
+    background-image: url("../assets/zhuan@2x.png");
+    background-repeat: no-repeat;
   }
   .shopMain_sales_line_button1 {
-    width: 50%;
     text-align: right;
     background: url("../assets/unfold.png") no-repeat;
     background-position: right;
@@ -401,7 +425,6 @@ export default {
     color: #AEAEAE;
   }
   .shopMain_sales_line_button2 {
-    width: 50%;
     text-align: right;
     background: url("../assets/packup.png") no-repeat;
     background-position: right;
@@ -421,12 +444,12 @@ export default {
   }
   .shopMain_list_title_line {
     display: flex;
+    font-size: 15px;
   }
   .shopMain_list_title {
     width: 14%;
     padding: 10px 0;
     text-align: center;
-    font-size: 20px;
     color: #2395ff;
     margin: 0 8%;
     border-bottom: 2px solid;
@@ -435,12 +458,10 @@ export default {
     align-items: center;
     display: flex;
     justify-content: center;
-    padding: 0 5px;
+    padding-bottom: 2px;
     font-size: 15px;
     margin: 10px;
-    border: 1px solid #ff6952;
-    border-radius: 5px;
-    color: #ff5339;
+    color: #333333;
   }
   .shopMain_list_total_kind {
     width: 30%;
@@ -613,7 +634,6 @@ export default {
     background: #ffffff;
   }
   .menu_item {
-    height: 98px;
     display: flex;
     justify-content: center;
     text-align: center;
@@ -641,10 +661,16 @@ export default {
     font-weight: bold;
     text-align: left;
   }
+  .menu_item_right_tags {
+    font-size: 10px;
+    color: #666666;
+    text-align: left;
+  }
   .menu_item_right_line {
     display: flex;
     justify-content: space-between;
     color: #E46D5D;
+    padding-top: 15px;
   }
   .menu_item_right_line_left {
     align-self: center;

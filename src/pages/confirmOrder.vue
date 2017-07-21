@@ -4,7 +4,7 @@
       <div class="order_confirm_top">
         <div class="title">
           <div class="title_line"></div>
-          <div class="title_text">{{shopInfo.shop_name}}</div>
+          <div class="title_text">{{shopInfo.name}}</div>
           <div class="title_line"></div>
         </div>
         <div v-for="item in list" class="order_line">
@@ -13,17 +13,16 @@
           <div class="order_amount"><span class="unit">￥</span>{{item.count * item.price}}</div>
         </div>
         <div class="order_line" style="border-bottom: 1px solid #eeeeee;">
-          <div class="order_name reduce_icon">满减优惠</div>
+          <div class="order_name reduce_icon" :class="'icon_' + discount.type">{{discount.name}}</div>
           <div class="order_acount"></div>
-          <div class="order_amount reduce"><span class="unit">-￥</span>{{discount}}</div>
+          <div class="order_amount reduce"><span class="unit">-￥</span>{{discount.reduce}}</div>
         </div>
         <div class="lucky_money_line" @click="popupVisible = true">
-          <div class="order_name">红包</div>
-          <div class="order_acount"></div>
-          <div class="order_amount reduce isLink">
-            <div v-if="luckyMoneyText" class="luckyMoneyText">{{luckyMoneyText}}</div>
+          <div class="lucky_money_line_text">红包</div>
+          <div class="lucky_money_line_amount reduce isLink">
+            <div v-if="luckyMoney.title" class="luckyMoneyText">{{luckyMoney.title}}</div>
             <div class="unit">-￥</div>
-            <div>{{luckyMoney}}</div>
+            <div>{{luckyMoney.reduce}}</div>
           </div>
         </div>
         <div class="lucky_money_line total_line">
@@ -31,16 +30,17 @@
           <div class="order_acount"></div>
           <div class="order_amount total_amount"><span class="unit2">小计￥</span><span class="total_amount">{{totalAmount}}</span></div>
         </div>
-        <div class="lucky_money_line total_line mark_line">
-          <div class="discount_detail">备注</div>
-          <textarea v-model="mark" class="mark_input" rows="4" placeholder="请填写您的其他要求……"></textarea>
+      </div>
+      <div class="order_confirm_other">
+        <div class="lucky_money_line total_line" @click="order_other = true">
+          <div class="order_confirm_other_select other_Link">口味偏好/餐具份数</div>
         </div>
       </div>
     </div>
     <div class="shopMain_list_bottom_line2">
       <div class="shopMain_list_bottom_amount">
         <div>￥{{totalAmount}}</div>
-        <div class="discount_display">已优惠{{discount + luckyMoney}}</div></div>
+        <div class="discount_display">已优惠{{parseFloat(discount.reduce) + parseFloat(luckyMoney.reduce)}}</div></div>
       <div class="shopMain_list_bottom_pay" @click="pay">去支付</div>
     </div>
     <mt-popup
@@ -59,11 +59,64 @@
         <div class="luckyMoney_count_detail">红包说明</div>
       </div>
       <div v-for="(item, key) in luckyMoneyList" class="luckyMoney_list luckyMoney_main no_select" :class="{isSelect: (key === luckyIndex)}" @click="chooseLukyMoney(item, key)">
-        <div class="order_name" style="width: 30%;text-align: center;color: #ff0034;font-size: 25px;"><span class="unit">￥</span>{{item.amount}}</div>
-        <div class="order_acount" style="width: 60%;text-align: left;">
-          <div style="color: #333333;font-weight: bold;">{{item.name}}</div>
-          <div style="color: #666666;font-size: 12px;padding-top: 5px;">{{item.startTime}}至{{item.endTime}}</div></div>
+        <div class="order_name" style="width: 30%;text-align: center;color: #ff0034;font-size: 25px;display: flex;flex-direction: column;justify-content: center;align-items: center;">
+          <div><span class="unit">￥</span>{{item.reduce}}</div>
+          <div class="luckyMoney_name">{{item.name}}</div>
+        </div>
+        <div class="order_acount" style="width: 60%;text-align: left;padding-left: 15px;">
+          <div style="color: #333333;font-weight: bold;">{{item.title}}</div>
+          <div style="color: #666666;font-size: 12px;padding-top: 5px;">{{item.times}}</div></div>
         <div class="order_amount"></div>
+      </div>
+    </mt-popup>
+    <mt-popup
+      v-model="order_other"
+      class="discount"
+      :modal="false"
+      position="right">
+      <mt-header style="fontSize: 20px;z-index: 9999" title="订单备注">
+        <div slot="left" class="backBtn" @click="order_other = false"></div>
+      </mt-header>
+      <div class="taste_content">
+        <div class="taste_title">口味偏好</div>
+        <div class="taste_tags">
+          <template v-for="(item, key) in mark.tags">
+            <div v-if="!item.children" class="taste_tags_button" :class="{taste_tags_button_selected: item.selected}" @click="item.selected = !item.selected">
+              {{item.name}}
+            </div>
+            <div v-else class="taste_tags_button no_padding">
+              <template v-for="(childrenItem, childrenKey) in item.children" >
+                <span class="taste_tags_children_button2" :class="{taste_tags_button_selected: (item.selected === childrenKey)}" @click="(item.selected === childrenKey ? (item.selected = false) : (item.selected = childrenKey))">{{childrenItem.preName}}{{item.name}}</span>
+                <span v-if="childrenKey !== (item.children.length - 1)" class="divide_line"></span>
+              </template>
+            </div>
+            <div class="divide_space"></div>
+          </template>
+        </div>
+        <textarea v-model="mark.remark" class="taste_marks" rows="4" placeholder="请输入备注内容(可不填)" maxlength="50"></textarea>
+        <div class="remark_tips">{{mark.remark.length}}/50</div>
+      </div>
+      <div class="customer_number">
+        <div class="taste_title">餐具份数</div>
+        <div class="customer_number_content">
+          <div class="taste_tags_button" :class="{taste_tags_button_selected: (mark.number === 0)}" @click="mark.number = 0">无特殊要求</div>
+          <div class="taste_tags_button no_padding" style="display: flex;flex: 1 0 auto;margin-left: 15px;">
+            <span class="taste_tags_children_button2" :class="{taste_tags_button_selected: (mark.number === 1)}" @click="mark.number === 1 ? (mark.number = 0) : (mark.number = 1)">1</span>
+            <span class="divide_line"></span>
+            <span class="taste_tags_children_button2" :class="{taste_tags_button_selected: (mark.number === 2)}" @click="mark.number === 2 ? (mark.number = 0) : (mark.number = 2)">2</span>
+            <span class="divide_line"></span>
+            <span class="taste_tags_children_button2" :class="{taste_tags_button_selected: (mark.number === 3)}" @click="mark.number === 3 ? (mark.number = 0) : (mark.number = 3)">3</span>
+            <span class="divide_line"></span>
+            <span class="taste_tags_children_button2" :class="{taste_tags_button_selected: (mark.number === 4)}" @click="mark.number === 4 ? (mark.number = 0) : (mark.number = 4)">4</span>
+            <span class="divide_line"></span>
+            <span class="taste_tags_children_button2" :class="{taste_tags_button_selected: (mark.number === 5)}" @click="mark.number === 5 ? (mark.number = 0) : (mark.number = 5)">5</span>
+            <span class="divide_line"></span>
+            <span class="taste_tags_children_button2" :class="{taste_tags_button_selected: (mark.number === 6)}" @click="mark.number === 6 ? (mark.number = 0) : (mark.number = 6)">6</span>
+          </div>
+        </div>
+      </div>
+      <div class="other_confirm">
+        <button class="other_confirm_button" @click="order_other = false">确定</button>
       </div>
     </mt-popup>
   </div>
@@ -71,21 +124,36 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { Popup, Header } from 'mint-ui'
+import { Popup, Header, Toast } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
     if (this.orderInfo.order) {
       this.list = this.orderInfo.order
       this.discount = this.orderInfo.discount
+      this.$http.post('/coupon/get.html', {data: this.userInfo}).then((data) => {
+        var result = data.data
+        if (parseInt(result.errcode) !== 0) {
+          Toast(result.errmsg)
+          return
+        }
+        this.luckyMoneyList = result.couponList
+        var tmpTotalAmount = 0
+        this.list.forEach((val) => {
+          tmpTotalAmount += (val.count * (val.price * 100))
+        })
+        this.luckyMoneyList.forEach((val, key) => {
+          if (tmpTotalAmount < val.gate) {
+            this.luckyMoneyList.splice(key, 1)
+          }
+        })
+      }).catch((e) => {
+        console.log(e)
+      })
     } else {
       this.$router.push({name: 'shopMain'})
     }
-    this.luckyMoneyList.forEach((val, key) => {
-      if ((new Date(val.startTime) > new Date()) || (new Date(val.endTime) < new Date())) {
-        this.luckyMoneyList.splice(key, 1)
-      }
-    })
+
     this.$refs.order_confirm.style.height = (document.documentElement.clientHeight - this.$refs.order_confirm.getBoundingClientRect().top) + 'px'
     this.$refs.order_confirm.style.overflow = 'auto'
   },
@@ -96,30 +164,47 @@ export default {
   data () {
     return {
       popupVisible: false,
+      order_other: false,
       list: [],
-      luckyMoneyList: [
-        {name: '超级会员专享', amount: 15, startTime: '2017-07-01', endTime: '2017-07-31'},
-        {name: '超级会员专享', amount: 5, startTime: '2017-06-01', endTime: '2017-08-31'},
-        {name: '超级会员专享', amount: 20, startTime: '2017-06-01', endTime: '2017-07-01'}
-      ],
-      discount: 0,
+      luckyMoneyList: [],
+      discount: {},
       luckyIndex: -1,
-      luckyMoney: 0,
-      luckyMoneyText: '',
-      mark: ''
+      luckyMoney: {reduce: 0, title: '', name: ''},
+      mark: {
+        remark: '',
+        number: 0,
+        tags: [
+          {name: '测试', selected: false},
+          {
+            name: '辣',
+            selected: false,
+            children: [
+              {preName: '不要'},
+              {preName: '少点'},
+              {preName: '多点'}
+            ]
+          },
+          {name: '不要香菜', selected: false},
+          {name: '不要洋葱', selected: false},
+          {name: '多点醋', selected: false},
+          {name: '多点葱', selected: false}
+        ]
+      }
     }
   },
   computed: {
     ...mapGetters([
+      'userInfo',
       'orderInfo',
       'shopInfo'
     ]),
     totalAmount () {
       var tmpTotalAmount = 0
       this.list.forEach((val) => {
-        tmpTotalAmount += val.count * val.price
+        tmpTotalAmount += (val.count * (val.price * 100))
       })
-      tmpTotalAmount = tmpTotalAmount - this.discount - this.luckyMoney
+      tmpTotalAmount = tmpTotalAmount - (this.discount.reduce * 100) - (this.luckyMoney.reduce * 100)
+      tmpTotalAmount = tmpTotalAmount / 100
       if (tmpTotalAmount < 0) {
         tmpTotalAmount = 0
       }
@@ -132,23 +217,48 @@ export default {
       if (key === -1) {
         this.popupVisible = false
         this.luckyIndex = -1
-        this.luckyMoney = 0
-        this.luckyMoneyText = ''
+        this.luckyMoney = {reduce: 0, title: '', name: ''}
       } else {
         this.popupVisible = false
         this.luckyIndex = key
-        this.luckyMoney = item.amount
-        this.luckyMoneyText = item.name
+        this.luckyMoney = item
       }
     },
     pay () {
-      this.orderInfo.orderId = '00001'
-      this.$router.push({name: 'payOrder'})
-    }
-  },
-  watch: {
-    mark (newVal) {
-      this.orderInfo.mark = newVal
+      this.orderInfo.mark = this.mark
+      this.orderInfo.luckyMoney = this.luckyMoney
+      var tags = []
+      this.mark.tags.forEach((val) => {
+        if (!val.children) {
+          val.selected ? tags.push(val.name) : ''
+        } else {
+          val.children.forEach((val1, key) => {
+            key === val.selected ? tags.push(val1.preName + val.name) : ''
+          })
+        }
+      })
+      tags = tags.join(',')
+      this.$http.post('/order/create.html', {
+        data: this.userInfo,
+        items: this.orderInfo.order,
+        discount: this.orderInfo.discount,
+        coupon: this.luckyMoney,
+        remark: {
+          remark: this.mark.remark,
+          number: this.mark.number,
+          tags: tags
+        }
+      }).then((data) => {
+        var result = data.data
+        if (parseInt(result.errcode) !== 0) {
+          Toast(result.errmsg)
+          return
+        }
+        this.orderInfo.orderList = result.orderList
+        this.$router.push({name: 'payOrder'})
+      }).catch((e) => {
+        console.log(e)
+      })
     }
   }
 }
@@ -163,6 +273,21 @@ export default {
   }
   .order_confirm_top {
     background: #ffffff;
+  }
+  .order_confirm_other {
+    background: #ffffff;
+    margin-top: 10px;
+  }
+  .order_confirm_other_select {
+    width: 100%;
+  }
+  .other_Link {
+    padding-right: 25px;
+    background: url('../assets/store@2x.png') no-repeat right;
+    background-size: 15px 15px;
+    display: flex;
+    align-items: center;
+    height: 50%;
   }
   .title {
     display: flex;
@@ -235,17 +360,23 @@ export default {
     align-items: center;
     height: 50px;
   }
+  .lucky_money_line_text {
+    font-size: 15px;
+  }
+  .lucky_money_line_amount {
+    font-size: 14px;
+    text-align: right;
+  }
   .isLink {
     padding-right: 25px;
     background: url('../assets/store@2x.png') no-repeat right;
-    background-size: contain;
+    background-size: 15px 15px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    width: 70%;
   }
   .total_line {
-    border-top: 0;
+    border: 0;
   }
   .mark_line {
     border: 0;
@@ -314,6 +445,10 @@ export default {
     padding: 5px;
     margin-right: 10px;
   }
+  .luckyMoney_name {
+    font-size: 12px;
+    color: #666666;
+  }
   .shopMain_list_bottom_line2 {
     height: 48px;
     display: flex;
@@ -374,5 +509,103 @@ export default {
     border: 1px solid #dddddd;
     border-radius: 8px;
     padding: 5px 5px;
+  }
+  .icon_1 {
+    background-image: url("../assets/jian@2x.png");
+    background-repeat: no-repeat;
+  }
+  .icon_2 {
+    background-image: url("../assets/fan@2x.png");
+    background-repeat: no-repeat;
+  }
+  .icon_3 {
+    background-image: url("../assets/xin@2x.png");
+    background-repeat: no-repeat;
+  }
+  .icon_4 {
+    background-image: url("../assets/zhuan@2x.png");
+    background-repeat: no-repeat;
+  }
+  .taste_content {
+    background: #ffffff;
+    padding: 15px;
+    position: relative;
+  }
+  .taste_title {
+    color: #333333;
+    font-weight: bold;
+    padding: 10px 0;
+    font-size: 15px;
+  }
+  .taste_tags {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .taste_tags_button {
+    padding: 5px 10px;
+    border: 1px solid #F2F2F2;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .no_padding {
+    padding: 0;
+  }
+  .taste_tags_children_button2 {
+    border-radius: 4px;
+    padding: 5px 10px;
+    flex: 1 0 auto;
+    text-align: center;
+  }
+  .taste_tags_button_selected {
+    color: #ffffff;
+    background: #2395FA;
+  }
+  .divide_line {
+    border-left: 1px solid #F2F2F2;
+    height: 16px;
+  }
+  .divide_space {
+    width: 20px;
+  }
+  .taste_marks {
+    width: 100%;
+    border: 1px solid #F2F2F2;
+    border-radius: 4px;
+    background: #FAFAFA;
+    padding: 5px;
+  }
+  .remark_tips {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+  }
+  .customer_number {
+    background: #ffffff;
+    padding: 15px;
+    margin-top: 15px;
+  }
+  .customer_number_content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .other_confirm {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  .other_confirm_button {
+    border-radius: 4px;
+    color: #ffffff;
+    background: #00D762;
+    width: 90%;
+    font-size: 15px;
+    height: 40px;
   }
 </style>
