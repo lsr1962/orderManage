@@ -10,7 +10,7 @@
         <div v-for="item in list" class="order_line">
           <div class="order_name">{{item.name}}</div>
           <div class="order_acount"><span class="unit">×</span>{{item.count}}</div>
-          <div class="order_amount"><span class="unit">￥</span>{{item.count * item.price}}</div>
+          <div class="order_amount"><span class="unit">￥</span>{{(item.count * (item.price * 100)) / 100}}</div>
         </div>
         <div class="order_line" style="border-bottom: 1px solid #eeeeee;">
           <div class="order_name reduce_icon" :class="'icon_' + discount.type">{{discount.name}}</div>

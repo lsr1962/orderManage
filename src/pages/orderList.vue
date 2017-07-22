@@ -1,83 +1,67 @@
 <template>
   <div class="order_list" ref="order_list">
-    <div v-for="(item, key) in list" class="order_list_item">
-      <img class="order_list_item_icon" :src="item.img || defaultImg" />
-      <div class="order_list_item_content" @click="gotoDetail(item)">
-        <div class="order_list_item_content_name">
-          <div class="order_list_item_content_name_text" @click.stop="gotoMain">{{shopInfo.shop_name}}</div>
-          <div class="order_list_item_content_name_pay" v-if="item.status === 0">去支付</div>
-          <div class="order_list_item_content_name_finish" v-else>订单已完成</div>
+    <mt-loadmore :autoFill="false" :bottom-method="loadBottom" @bottom-status-change="handleBottomChange" :bottom-all-loaded="allLoaded" ref="loadmore">
+      <ul>
+        <div v-for="(item, key) in list" class="order_list_item">
+          <img class="order_list_item_icon" :src="item.shopInfo.logo || defaultImg" />
+          <div class="order_list_item_content" @click="gotoDetail(item)">
+            <div class="order_list_item_content_name">
+              <div class="order_list_item_content_name_text" @click.stop="gotoMain">{{item.shopInfo.name}}</div>
+              <div class="order_list_item_content_name_finish">{{item.orderList.PayName}}</div>
+            </div>
+            <div class="order_list_item_content_time">{{item.orderList.PayTime}}</div>
+            <div class="order_list_item_content_detail">{{item.items[0].name}}&nbsp;&nbsp;等{{item.items.length}}个菜品</div>
+            <div class="order_list_item_content_amount">{{item.orderList.TradeAmount}}</div>
+          </div>
         </div>
-        <div class="order_list_item_content_time">{{item.pay_time}}</div>
-        <div class="order_list_item_content_detail">{{item.order[0].name}}&nbsp;&nbsp;等{{item.order.length}}个菜品</div>
-        <div class="order_list_item_content_amount">{{item.totalAmount}}</div>
-        <div class="order_list_item_content_name_gotoPay" v-if="item.status === 0" @click.stop="repay(item)">去支付</div>
+      </ul>
+      <div slot="bottom" class="mint-loadmore-bottom">
+        <span v-show="bottomStatus !== 'loading'" :class="{ 'is-rotate': bottomStatus === 'drop' }">↑</span>
+        <span v-show="bottomStatus === 'loading'">
+          <mt-spinner type="snake"></mt-spinner>
+        </span>
       </div>
-    </div>
+    </mt-loadmore>
     <div class="no_order" v-if="list.length === 0">没有订单信息，快去下单吧！</div>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
+import { Toast, Loadmore, Spinner } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
+    if (this.userInfo.openid) {
+      this.loadBottom()
+    } else {
+      this.$router.push({name: 'shopMain'})
+    }
     this.$refs.order_list.style.height = (document.documentElement.clientHeight - this.$refs.order_list.getBoundingClientRect().top) + 'px'
     this.$refs.order_list.style.overflow = 'auto'
   },
   components: {
+    [Loadmore.name]: Loadmore,
+    [Spinner.name]: Spinner
   },
   data () {
     return {
       defaultImg: require('../assets/default_log.png'),
-      list: [
-        {
-          order: [
-            {id: '1', kind: '1', name: '热销菜单1', img: '', price: 10, count: 1},
-            {id: '5', kind: '2', name: '优惠菜单5', img: '', price: 100, count: 1},
-            {id: '9', kind: '3', name: '满20减12菜单9', img: '', price: 16, count: 2},
-            {id: '13', kind: '3', name: '满20减12菜单13', img: '', price: 16, count: 3}
-          ],
-          totalAmount: 155,
-          discount: 20,
-          luckyMoneyText: '超级会员专享',
-          luckyMoney: 15,
-          mark: '不要辣椒',
-          pay_time: '2017-07-11',
-          orderId: '1',
-          payType: '微信支付',
-          status: 0
-        },
-        {
-          order: [
-            {id: '1', kind: '1', name: '尖椒肉丝', img: '', price: 10, count: 1},
-            {id: '9', kind: '3', name: '米饭', img: '', price: 16, count: 2},
-            {id: '13', kind: '3', name: '酸梅汤', img: '', price: 16, count: 3}
-          ],
-          totalAmount: 77,
-          discount: 12,
-          luckyMoneyText: '超级会员专享',
-          luckyMoney: 5,
-          mark: '少盐少油',
-          pay_time: '2017-07-18',
-          orderId: '1',
-          payType: '支付宝支付',
-          status: 1
-        }
-      ]
+      order: {
+        last: 1,
+        amount: 10
+      },
+      list: [],
+      allLoaded: false,
+      bottomStatus: ''
     }
   },
   computed: {
     ...mapGetters([
-      'shopInfo',
-      'orderInfo'
+      'userInfo'
     ])
   },
   methods: {
-    ...mapActions([
-      'setShopInfo'
-    ]),
     dateFormat (value, fmt) {
       var o = {
         'M+': value.getMonth() + 1, // 月份
@@ -94,16 +78,35 @@ export default {
       }
       return fmt
     },
-    repay (item) {
-      this.orderInfo.orderId = item.orderId
-      this.orderInfo.totalAmount = item.totalAmount
-      this.$router.push({name: 'payOrder'})
-    },
     gotoMain () {
       this.$router.push({name: 'shopMain'})
     },
     gotoDetail (item) {
       this.$router.push({name: 'orderDetail', params: {item: item}})
+    },
+    handleBottomChange (status) {
+      this.bottomStatus = status
+    },
+    loadBottom () {
+      this.$http.post('/order/get.html', {
+        data: this.userInfo,
+        order: this.order
+      }).then((data) => {
+        var result = data.data
+        if (parseInt(result.errcode) !== 0) {
+          Toast(result.errmsg)
+          return
+        }
+        this.list = this.list.concat(result.dataList)
+        if (result.dataList.length < 10) {
+          this.allLoaded = true
+        } else {
+          this.order.last += 10
+        }
+      }).catch((e) => {
+        console.log(e)
+      })
+      this.$refs.loadmore.onBottomLoaded()
     }
   },
   watch: {

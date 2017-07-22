@@ -2,58 +2,57 @@
   <div class="order_detail" ref="order_detail">
     <div class="finish_top">
       <div class="finish_top_time_area">
-        <img style="height: 100%;" src="../assets/markbg@2x.png"/>
+        <img style="height: 100%;" :src="orderItem.shopInfo.logo || defaultImg"/>
       </div>
-      <div class="finish_tips">准时达订单</div>
-      <div v-if="orderItem.status === 0" class="finish_tips2">订单尚未支付</div>
-      <div v-else class="finish_tips2">订单已准时送达，感谢您使用准时达服务</div>
-      <div v-if="orderItem.status === 0" class="order_list_item_content_name_gotoPay" @click="repay(orderItem)">去支付</div>
-      <div v-else class="finish_tips3">订单已完成</div>
+      <div class="finish_tips">{{orderItem.orderList.tags}}</div>
+      <div class="finish_tips2">{{orderItem.orderList.text}}</div>
+      <div class="finish_tips3">{{orderItem.orderList.PayName}}</div>
       <div class="finish_luckyMoney">发红包</div>
     </div>
     <div class="detail_content">
       <div class="detail_content_order">
         <div class="order_line" style="border-bottom: 1px solid #eeeeee;" @click.stop="gotoMain">
-          <div class="order_list_item_content_name_text">{{shopInfo.shop_name}}</div>
+          <div class="order_list_item_content_name_text">{{orderItem.shopInfo.name}}</div>
         </div>
-        <div v-for="item in orderItem.order" class="order_line">
+        <div v-for="item in orderItem.items" class="order_line">
           <div class="order_name">{{item.name}}</div>
           <div class="order_acount"><span class="unit">×</span>{{item.count}}</div>
-          <div class="order_amount"><span class="unit">￥</span>{{item.count * item.price}}</div>
+          <div class="order_amount"><span class="unit">￥</span>{{(item.count * (item.price * 100)) / 100}}</div>
         </div>
-        <div class="order_line" style="border-bottom: 1px solid #eeeeee;">
-          <div class="order_name reduce_icon">满减优惠</div>
+        <div class="order_line" style="border-bottom: 1px solid #eeeeee;" v-if="!Array.isArray(orderItem.discount)">
+          <div class="order_name reduce_icon" :class="'icon_' + orderItem.discount.type">{{orderItem.discount.name}}</div>
           <div class="order_acount"></div>
-          <div class="order_amount reduce"><span class="unit">-￥</span>{{orderItem.discount}}</div>
+          <div class="order_amount reduce"><span class="unit">-￥</span>{{orderItem.discount.reduce}}</div>
         </div>
-        <div class="lucky_money_line">
+        <div class="lucky_money_line" v-if="!Array.isArray(orderItem.coupon)">
           <div class="order_name">红包</div>
           <div class="order_acount"></div>
           <div class="order_amount reduce is_lucky_money">
-            <div v-if="orderItem.luckyMoneyText" class="luckyMoneyText">{{orderItem.luckyMoneyText}}</div>
+            <div v-if="orderItem.coupon.title" class="luckyMoneyText">{{orderItem.coupon.title}}</div>
+            <div v-else></div>
             <div class="unit">-￥</div>
-            <div>{{orderItem.luckyMoney}}</div>
+            <div>{{orderItem.coupon.reduce}}</div>
           </div>
         </div>
         <div class="lucky_money_line total_line">
           <div class="discount_detail discount_icon"></div>
           <div class="order_acount"></div>
-          <div class="order_amount total_amount"><span class="unit2">{{(orderItem.status === 0 ? '小计' : '实付')}}￥</span><span class="total_amount">{{orderItem.totalAmount}}</span></div>
+          <div class="order_amount total_amount"><span class="unit2">小计￥</span><span class="total_amount">{{orderItem.orderList.TradeAmount}}</span></div>
         </div>
       </div>
-      <div class="detail_content_order" v-if="orderItem.status !== 0">
+      <div class="detail_content_order">
         <div class="order_info_title">订单信息</div>
         <div class="order_info_line">
           <div class="order_info_line_title">订单号</div>
-          <div class="order_info_line_text">{{orderItem.orderId}}</div>
+          <div class="order_info_line_text">{{orderItem.orderList.OrderId}}</div>
         </div>
         <div class="order_info_line">
           <div class="order_info_line_title">支付方式</div>
-          <div class="order_info_line_text">{{orderItem.payType}}</div>
+          <div class="order_info_line_text">{{orderItem.orderList.payType}}</div>
         </div>
         <div class="order_info_line">
           <div class="order_info_line_title">下单时间</div>
-          <div class="order_info_line_text">{{orderItem.pay_time}}</div>
+          <div class="order_info_line_text">{{orderItem.orderList.PayTime}}</div>
         </div>
       </div>
     </div>
@@ -70,15 +69,23 @@ export default {
     } else {
       this.$router.push({name: 'shopMain'})
     }
-    this.$refs.order_detail.style.height = (document.documentElement.clientHeight - this.$refs.order_detail.getBoundingClientRect().top) + 'px'
-    this.$refs.order_detail.style.overflow = 'auto'
+    this.$nextTick(() => {
+      this.$refs.order_detail.style.height = (document.documentElement.clientHeight - this.$refs.order_detail.getBoundingClientRect().top) + 'px'
+      this.$refs.order_detail.style.overflow = 'auto'
+    })
   },
   components: {
   },
   data () {
     return {
       defaultImg: require('../assets/default_log.png'),
-      orderItem: {}
+      orderItem: {
+        coupon: [],
+        discount: [],
+        shopInfo: {},
+        orderList: {},
+        items: []
+      }
     }
   },
   computed: {
@@ -307,5 +314,21 @@ export default {
     color: #ff5339;
     border-radius: 5px;
     margin-top: 15px;
+  }
+  .icon_1 {
+    background-image: url("../assets/jian@2x.png");
+    background-repeat: no-repeat;
+  }
+  .icon_2 {
+    background-image: url("../assets/fan@2x.png");
+    background-repeat: no-repeat;
+  }
+  .icon_3 {
+    background-image: url("../assets/xin@2x.png");
+    background-repeat: no-repeat;
+  }
+  .icon_4 {
+    background-image: url("../assets/zhuan@2x.png");
+    background-repeat: no-repeat;
   }
 </style>

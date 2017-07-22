@@ -32,7 +32,8 @@
 </template>
 
 <script>
-import { mapGetters, mapActions, Toast } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
+import { Toast } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {

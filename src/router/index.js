@@ -10,6 +10,7 @@ const orderList = r => require.ensure([], () => r(require('../pages/orderList.vu
 const orderDetail = r => require.ensure([], () => r(require('../pages/orderDetail.vue')), 'orderDetail')
 
 export default new Router({
+  mode: 'history',
   routes: [
     {
       path: '/',

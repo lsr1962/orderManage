@@ -117,54 +117,46 @@ import { Popup, Badge, PaletteButton, Toast } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
-    this.setUserInfo({
+    /* this.setUserInfo({
       wid: '21',
       shopid: '2',
       qrGID: 'UFI=-UA==-U1EJ',
       openid: 'ow5uyv8rECDpJ26hTlfH1gQqbwr8'
-    })
+    }) */
     if (this.userInfo.openid) {
-      this.$http.post('/main/get.html', {data: this.userInfo}).then((data) => {
-        var result = data.data
-        if (parseInt(result.errcode) !== 0) {
-          Toast(result.errmsg)
-          return
-        }
-        this.setShopInfo({
-          name: result.shopInfo.name,
-          logo: result.shopInfo.logo,
-          notice: result.shopInfo.notice,
-          tags: result.shopInfo.tags,
-          salesList: result.salesList
-        })
-        this.kindList = result.menuList
-        this.allMenuList = result.proList
-        this.getCurrentMenuList(0)
-        var lastMenu = window.localStorage.getItem('yjiatech_menu')
-        if (lastMenu) {
-          try {
-            JSON.parse(lastMenu).forEach((item) => {
-              this.allMenuList.forEach((val) => {
-                if (val.id === item.id) {
-                  val.count = item.count
-                }
-              })
-              this.kindList.forEach((val) => {
-                if (val.type === item.kind) {
-                  val.count += item.count
-                }
-              })
-            })
-          } catch (e) {
-
+      this.getMainInfo()
+    } else {
+      if (this.$route.query.code) {
+        this.$http.post('/token/openid.html', {
+          data: {
+            wid: this.$route.query.wid,
+            shopid: this.$route.query.shopid,
+            qrGID: this.$route.query.qrGID,
+            openid: ''
+          },
+          token: {
+            code: this.$route.query.code
           }
-        }
-        this.$nextTick(() => {
-          this.resizeList()
+        }).then((data) => {
+          var result = data.data
+          if (parseInt(result.errcode) !== 0) {
+            Toast(result.errmsg)
+            return
+          }
+          console.log(result)
+          this.setUserInfo({
+            wid: this.$route.query.wid,
+            shopid: this.$route.query.shopid,
+            qrGID: this.$route.query.qrGID,
+            openid: result.openid
+          })
+          this.getMainInfo()
+        }).catch((e) => {
+          console.log(e)
         })
-      }).catch((e) => {
-        console.log(e)
-      })
+      } else {
+        this.getCode()
+      }
     }
   },
   components: {
@@ -280,6 +272,71 @@ export default {
     displayItem (item) {
       this.chooseItem = true
       this.largeItem = item.img || this.defaultImg
+    },
+    getCode () {
+      this.$http.post('/token/appid.html', {
+        data: {
+          wid: this.$route.query.wid,
+          shopid: this.$route.query.shopid,
+          qrGID: this.$route.query.qrGID,
+          openid: ''
+        }
+      }).then((data) => {
+        var result = data.data
+        if (parseInt(result.errcode) !== 0) {
+          Toast(result.errmsg)
+          return
+        }
+        const APPID = result.AppId
+        const redirectURL = encodeURIComponent(window.location.href)
+        console.log(result)
+        window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + APPID + '&redirect_uri=' + redirectURL + '&response_type=code&scope=snsapi_base&state=123#wechat_redirect'
+      }).catch((e) => {
+        console.log(e)
+      })
+    },
+    getMainInfo () {
+      this.$http.post('/main/get.html', {data: this.userInfo}).then((data) => {
+        var result = data.data
+        if (parseInt(result.errcode) !== 0) {
+          Toast(result.errmsg)
+          return
+        }
+        this.setShopInfo({
+          name: result.shopInfo.name,
+          logo: result.shopInfo.logo,
+          notice: result.shopInfo.notice,
+          tags: result.shopInfo.tags,
+          salesList: result.salesList
+        })
+        this.kindList = result.menuList
+        this.allMenuList = result.proList
+        this.getCurrentMenuList(0)
+        var lastMenu = window.localStorage.getItem('yjiatech_menu')
+        if (lastMenu) {
+          try {
+            JSON.parse(lastMenu).forEach((item) => {
+              this.allMenuList.forEach((val) => {
+                if (val.id === item.id) {
+                  val.count = item.count
+                }
+              })
+              this.kindList.forEach((val) => {
+                if (val.type === item.kind) {
+                  val.count += item.count
+                }
+              })
+            })
+          } catch (e) {
+
+          }
+        }
+        this.$nextTick(() => {
+          this.resizeList()
+        })
+      }).catch((e) => {
+        console.log(e)
+      })
     }
   },
   watch: {
