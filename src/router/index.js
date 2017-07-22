@@ -14,6 +14,10 @@ export default new Router({
   routes: [
     {
       path: '/',
+      redirect: '/html/shop/shopMain'
+    },
+    {
+      path: '/html/shop/shopMain',
       name: 'shopMain',
       component: shopMain,
       meta: {
@@ -22,7 +26,7 @@ export default new Router({
       }
     },
     {
-      path: '/confirmOrder',
+      path: '/html/shop/confirmOrder',
       name: 'confirmOrder',
       component: confirmOrder,
       meta: {
@@ -30,7 +34,7 @@ export default new Router({
       }
     },
     {
-      path: '/payOrder',
+      path: '/html/shop/payOrder',
       name: 'payOrder',
       component: payOrder,
       meta: {
@@ -38,7 +42,7 @@ export default new Router({
       }
     },
     {
-      path: '/payFinish',
+      path: '/html/shop/payFinish',
       name: 'payFinish',
       component: payFinish,
       meta: {
@@ -46,7 +50,7 @@ export default new Router({
       }
     },
     {
-      path: '/orderList',
+      path: '/html/shop/orderList',
       name: 'orderList',
       component: orderList,
       meta: {
@@ -54,7 +58,7 @@ export default new Router({
       }
     },
     {
-      path: '/orderDetail',
+      path: '/html/shop/orderDetail',
       name: 'orderDetail',
       component: orderDetail,
       meta: {

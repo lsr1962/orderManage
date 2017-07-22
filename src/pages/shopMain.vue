@@ -126,36 +126,65 @@ export default {
     if (this.userInfo.openid) {
       this.getMainInfo()
     } else {
-      if (this.$route.query.code) {
-        this.$http.post('/token/openid.html', {
-          data: {
-            wid: this.$route.query.wid,
-            shopid: this.$route.query.shopid,
-            qrGID: this.$route.query.qrGID,
-            openid: ''
-          },
-          token: {
-            code: this.$route.query.code
+      if (this.isWeiXin() === 'wx') {
+        var savedId = window.localStorage.getItem('yjiatech_id')
+        var isSaved = true
+        try {
+          if (JSON.parse(savedId).openid && (JSON.parse(savedId).wid === this.$route.query.wid)) {
+            this.setUserInfo(JSON.parse(savedId))
+            this.getMainInfo()
+          } else {
+            isSaved = false
           }
-        }).then((data) => {
-          var result = data.data
-          if (parseInt(result.errcode) !== 0) {
-            Toast(result.errmsg)
-            return
+        } catch (e) {
+          isSaved = false
+        }
+        if (!isSaved) {
+          if (this.$route.query.codde) {
+            this.$http.post('/token/openid.html', {
+              data: {
+                wid: this.$route.query.wid,
+                shopid: this.$route.query.shopid,
+                qrGID: this.$route.query.qrGID,
+                openid: ''
+              },
+              token: {
+                code: this.$route.query.code
+              }
+            }).then((data) => {
+              var result = data.data
+              if (parseInt(result.errcode) !== 0) {
+                Toast(result.errmsg)
+                return
+              }
+              window.localStorage.setItem('yjiatech_id', JSON.stringify({
+                wid: this.$route.query.wid,
+                shopid: this.$route.query.shopid,
+                qrGID: this.$route.query.qrGID,
+                openid: result.openid
+              }))
+              this.setUserInfo({
+                wid: this.$route.query.wid,
+                shopid: this.$route.query.shopid,
+                qrGID: this.$route.query.qrGID,
+                openid: result.openid
+              })
+              this.getMainInfo()
+            }).catch((e) => {
+              console.log(e)
+            })
+          } else {
+            this.getCode()
           }
-          console.log(result)
-          this.setUserInfo({
-            wid: this.$route.query.wid,
-            shopid: this.$route.query.shopid,
-            qrGID: this.$route.query.qrGID,
-            openid: result.openid
-          })
-          this.getMainInfo()
-        }).catch((e) => {
-          console.log(e)
-        })
+        }
       } else {
-        this.getCode()
+        this.setUserInfo({
+          wid: this.$route.query.wid,
+          shopid: this.$route.query.shopid,
+          qrGID: this.$route.query.qrGID,
+          openid: ''
+        })
+        this.getMainInfo()
       }
     }
   },
@@ -207,6 +236,16 @@ export default {
       'setShopInfo',
       'setOrderInfo'
     ]),
+    isWeiXin () {
+      var ua = window.navigator.userAgent.toLowerCase()
+      if (ua.match(/MicroMessenger/i) + '' === 'micromessenger') {
+        return 'wx'
+      } else if (ua.match(/Alipay/i) + '' === 'alipay') {
+        return 'alipay'
+      } else {
+        return 'wap'
+      }
+    },
     toggleType () {
       this.pullDown = !this.pullDown
       this.$nextTick(() => {
