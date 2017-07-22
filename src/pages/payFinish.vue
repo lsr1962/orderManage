@@ -57,8 +57,11 @@ export default {
         this.name = result.orderList.name
         this.couponList = result.couponList
         this.shareList = result.shareList
-        if (result.couponList !== {}) {
-          this.popupVisible = true
+        try {
+          if (result.couponList.money > 0) {
+            this.popupVisible = true
+          }
+        } catch (e) {
         }
       }).catch((e) => {
         console.log(e)
