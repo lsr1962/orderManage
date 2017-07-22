@@ -38,10 +38,10 @@ export default {
   name: 'shopMain',
   mounted () {
     if (this.orderInfo.orderList) {
-      this.now_time = new Date(this.orderInfo.orderList.startTime)
+      this.now_time = new Date(this.orderInfo.orderList.startTime.replace(/-/g, '/'))
       var intervalFun = () => {
         this.now_time = new Date(this.now_time.setSeconds(this.now_time.getSeconds() + 1))
-        this.remain_time = this.dateFormat(new Date(new Date(this.orderInfo.orderList.endTime).getTime() - this.now_time.getTime()), 'mm:ss')
+        this.remain_time = this.dateFormat(new Date(new Date(this.orderInfo.orderList.endTime.replace(/-/g, '/')).getTime() - this.now_time.getTime()), 'mm:ss')
         if (this.remain_time === '00:00') {
           this.$refs.pay_display.innerHTML = '重新下单'
           this.$refs.pay_display.style.background = '#595959'
