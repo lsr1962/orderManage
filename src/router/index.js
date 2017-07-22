@@ -42,7 +42,8 @@ export default new Router({
       name: 'payFinish',
       component: payFinish,
       meta: {
-        title: '订单完成'
+        title: '订单完成',
+        home: true
       }
     },
     {
