@@ -19,7 +19,7 @@
     <div class="shopMain_list">
       <div class="shopMain_list_title_line">
         <div class="shopMain_list_title">商品</div>
-        <div class="shopMain_list_order" @click="$router.push({name: 'orderList'})">查看订单</div>
+        <div class="shopMain_list_order" @click="$router.push({name: 'orderList', query: $route.query})">查看订单</div>
       </div>
       <div class="shopMain_list_total" ref="list_frame">
         <div class="shopMain_list_total_kind">
@@ -123,7 +123,7 @@ export default {
       qrGID: 'UFI=-UA==-U1EJ',
       openid: 'ow5uyv8rECDpJ26hTlfH1gQqbwr8'
     }) */
-    if (this.userInfo.openid) {
+    if (this.userInfo.wid) {
       this.getMainInfo()
     } else {
       if (this.isWeiXin() === 'wx') {
@@ -140,42 +140,35 @@ export default {
           isSaved = false
         }
         if (!isSaved) {
-          if (this.$route.query.codde) {
-            this.$http.post('/token/openid.html', {
-              data: {
-                wid: this.$route.query.wid,
-                shopid: this.$route.query.shopid,
-                qrGID: this.$route.query.qrGID,
-                openid: ''
-              },
-              token: {
-                code: this.$route.query.code
-              }
-            }).then((data) => {
-              var result = data.data
-              if (parseInt(result.errcode) !== 0) {
-                Toast(result.errmsg)
-                return
-              }
-              window.localStorage.setItem('yjiatech_id', JSON.stringify({
-                wid: this.$route.query.wid,
-                shopid: this.$route.query.shopid,
-                qrGID: this.$route.query.qrGID,
-                openid: result.openid
-              }))
-              this.setUserInfo({
-                wid: this.$route.query.wid,
-                shopid: this.$route.query.shopid,
-                qrGID: this.$route.query.qrGID,
-                openid: result.openid
-              })
-              this.getMainInfo()
-            }).catch((e) => {
-              console.log(e)
+          this.$http.post('/token/openid.html', {
+            data: {
+              wid: this.$route.query.wid,
+              shopid: this.$route.query.shopid,
+              qrGID: this.$route.query.qrGID,
+              openid: ''
+            }
+          }).then((data) => {
+            var result = data.data
+            if (parseInt(result.errcode) !== 0) {
+              Toast(result.errmsg)
+              return
+            }
+            window.localStorage.setItem('yjiatech_id', JSON.stringify({
+              wid: this.$route.query.wid,
+              shopid: this.$route.query.shopid,
+              qrGID: this.$route.query.qrGID,
+              openid: result.openid
+            }))
+            this.setUserInfo({
+              wid: this.$route.query.wid,
+              shopid: this.$route.query.shopid,
+              qrGID: this.$route.query.qrGID,
+              openid: result.openid
             })
-          } else {
-            this.getCode()
-          }
+            this.getMainInfo()
+          }).catch((e) => {
+            console.log(e)
+          })
         }
       } else {
         this.setUserInfo({
@@ -306,7 +299,7 @@ export default {
       })
     },
     pay () {
-      this.$router.push({name: 'confirmOrder'})
+      this.$router.push({name: 'confirmOrder', query: this.$route.query})
     },
     displayItem (item) {
       this.chooseItem = true

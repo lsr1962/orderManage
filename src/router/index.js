@@ -10,14 +10,10 @@ const orderList = r => require.ensure([], () => r(require('../pages/orderList.vu
 const orderDetail = r => require.ensure([], () => r(require('../pages/orderDetail.vue')), 'orderDetail')
 
 export default new Router({
-  mode: 'history',
+  mode: 'hash',
   routes: [
     {
       path: '/',
-      redirect: '/html/shop/shopMain'
-    },
-    {
-      path: '/html/shop/shopMain',
       name: 'shopMain',
       component: shopMain,
       meta: {
@@ -26,7 +22,7 @@ export default new Router({
       }
     },
     {
-      path: '/html/shop/confirmOrder',
+      path: '/confirmOrder',
       name: 'confirmOrder',
       component: confirmOrder,
       meta: {
@@ -34,7 +30,7 @@ export default new Router({
       }
     },
     {
-      path: '/html/shop/payOrder',
+      path: '/payOrder',
       name: 'payOrder',
       component: payOrder,
       meta: {
@@ -42,7 +38,7 @@ export default new Router({
       }
     },
     {
-      path: '/html/shop/payFinish',
+      path: '/payFinish',
       name: 'payFinish',
       component: payFinish,
       meta: {
@@ -50,7 +46,7 @@ export default new Router({
       }
     },
     {
-      path: '/html/shop/orderList',
+      path: '/orderList',
       name: 'orderList',
       component: orderList,
       meta: {
@@ -58,7 +54,7 @@ export default new Router({
       }
     },
     {
-      path: '/html/shop/orderDetail',
+      path: '/orderDetail',
       name: 'orderDetail',
       component: orderDetail,
       meta: {

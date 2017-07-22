@@ -8,7 +8,7 @@
         </div>
         <div class="pay_order_name">
           <div class="pay_order_name_text">{{shopInfo.name}}</div>
-          <div class="pay_order_name_amount"><span class="unit">￥</span>{{orderInfo.orderList.TradeAmount}}</div>
+          <div class="pay_order_name_amount"><span class="unit">￥</span>{{orderInfo.orderList ? orderInfo.orderList.TradeAmount : ''}}</div>
         </div>
       </div>
       <div class="choose_method">
@@ -26,7 +26,7 @@
       </div>
     </div>
     <div class="shopMain_list_bottom_line2" @click="pay">
-      <div class="shopMain_list_bottom_pay" ref="pay_display">确认支付<span class="unit">￥</span>{{orderInfo.orderList.TradeAmount}}</div>
+      <div class="shopMain_list_bottom_pay" ref="pay_display">确认支付<span class="unit">￥</span>{{orderInfo.orderList ? orderInfo.orderList.TradeAmount : ''}}</div>
     </div>
   </div>
 </template>
@@ -52,7 +52,7 @@ export default {
       intervalFun()
       this.timer = window.setInterval(intervalFun, 1000)
     } else {
-      this.$router.push({name: 'shopMain'})
+      this.$router.push({name: 'shopMain', query: this.$route.query})
     }
     this.$refs.pay_order.style.height = (document.documentElement.clientHeight - this.$refs.pay_order.getBoundingClientRect().top) + 'px'
     this.$refs.pay_order.style.overflow = 'auto'
@@ -122,7 +122,7 @@ export default {
     },
     pay () {
       if (this.remain_time === '00:00') {
-        this.$router.push({name: 'shopMain'})
+        this.$router.push({name: 'shopMain', query: this.$route.query})
       } else {
         this.$http.post('/order/doPay.html', {
           data: this.userInfo,

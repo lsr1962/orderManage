@@ -32,10 +32,10 @@ import { Toast, Loadmore, Spinner } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
-    if (this.userInfo.openid) {
+    if (this.userInfo.wid) {
       this.loadBottom()
     } else {
-      this.$router.push({name: 'shopMain'})
+      this.$router.push({name: 'shopMain', query: this.$route.query})
     }
     this.$refs.order_list.style.height = (document.documentElement.clientHeight - this.$refs.order_list.getBoundingClientRect().top) + 'px'
     this.$refs.order_list.style.overflow = 'auto'
@@ -79,10 +79,10 @@ export default {
       return fmt
     },
     gotoMain () {
-      this.$router.push({name: 'shopMain'})
+      this.$router.push({name: 'shopMain', query: this.$route.query})
     },
     gotoDetail (item) {
-      this.$router.push({name: 'orderDetail', params: {item: item}})
+      this.$router.push({name: 'orderDetail', params: {item: item}, query: this.$route.query})
     },
     handleBottomChange (status) {
       this.bottomStatus = status

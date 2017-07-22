@@ -152,7 +152,7 @@ export default {
         console.log(e)
       })
     } else {
-      this.$router.push({name: 'shopMain'})
+      this.$router.push({name: 'shopMain', query: this.$route.query})
     }
 
     this.$refs.order_confirm.style.height = (document.documentElement.clientHeight - this.$refs.order_confirm.getBoundingClientRect().top) + 'px'
@@ -256,7 +256,7 @@ export default {
           return
         }
         this.orderInfo.orderList = result.orderList
-        this.$router.push({name: 'payOrder'})
+        this.$router.push({name: 'payOrder', query: this.$route.query})
       }).catch((e) => {
         console.log(e)
       })

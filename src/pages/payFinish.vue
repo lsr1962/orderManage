@@ -9,8 +9,8 @@
       <div class="finish_tips2">{{text}}</div>
       <div class="finish_tips3">{{name}}</div>
       <div class="finish_buttons">
-        <div class="finish_button left" @click="$router.push({name: 'orderList'})">查看订单</div>
-        <div class="finish_button right" @click="$router.push({name: 'shopMain'})">商家首页</div>
+        <div class="finish_button left" @click="$router.push({name: 'orderList', query: $route.query})">查看订单</div>
+        <div class="finish_button right" @click="$router.push({name: 'shopMain', query: $route.query})">商家首页</div>
       </div>
       <div class="finish_luckyMoney" v-if="shareList.isShare === '0'">发红包</div>
     </div>
@@ -32,7 +32,7 @@ import { Popup, Toast } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
-    if (this.$route.query.OrderId && !this.userInfo.openid) {
+    if (this.$route.query.OrderId && !this.userInfo.wid) {
       this.query_params = this.$route.query
       this.setUserInfo({
         wid: this.$route.query.wid,
@@ -64,7 +64,7 @@ export default {
         console.log(e)
       })
     } else {
-      this.$router.push({name: 'shopMain'})
+      this.$router.push({name: 'shopMain', query: this.$route.query})
     }
     this.$refs.finish_order.style.height = (document.documentElement.clientHeight - this.$refs.finish_order.getBoundingClientRect().top) + 'px'
   },

@@ -67,7 +67,7 @@ export default {
     if (this.$route.params.item) {
       this.orderItem = this.$route.params.item
     } else {
-      this.$router.push({name: 'shopMain'})
+      this.$router.push({name: 'shopMain', query: this.$route.query})
     }
     this.$nextTick(() => {
       this.$refs.order_detail.style.height = (document.documentElement.clientHeight - this.$refs.order_detail.getBoundingClientRect().top) + 'px'
@@ -117,10 +117,10 @@ export default {
     repay (item) {
       this.orderInfo.orderId = item.orderId
       this.orderInfo.totalAmount = item.totalAmount
-      this.$router.push({name: 'payOrder'})
+      this.$router.push({name: 'payOrder', query: this.$route.query})
     },
     gotoMain () {
-      this.$router.push({name: 'shopMain'})
+      this.$router.push({name: 'shopMain', query: this.$route.query})
     },
     gotoDetail (item) {
       console.log(item.orderId)
