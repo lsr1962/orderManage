@@ -12,15 +12,20 @@
           <div class="order_acount"><span class="unit">×</span>{{item.count}}</div>
           <div class="order_amount"><span class="unit">￥</span>{{(item.count * (item.price * 100)) / 100}}</div>
         </div>
-        <div class="order_line" style="border-bottom: 1px solid #eeeeee;">
-          <div class="order_name reduce_icon" :class="'icon_' + discount.type">{{discount.name}}</div>
-          <div class="order_acount"></div>
-          <div class="order_amount reduce"><span class="unit">-￥</span>{{discount.reduce}}</div>
+        <div style="margin: 0 15px;border-bottom: 1px solid #eeeeee;">
+          <div class="order_line" style="margin: 0">
+            <div class="order_name reduce_icon" :class="'icon_' + discount.type">{{discount.name}}</div>
+            <div class="order_acount"></div>
+            <div class="order_amount reduce"><span class="unit">-￥</span>{{discount.reduce}}</div>
+          </div>
+          <div class="order_line" style="margin: 0" v-for="(item, key) in otherSalesList" :key="item.id" :class="{total_line: (key === (otherSalesList.length - 1))}">
+            <div class="order_name reduce_icon" :class="'icon_' + item.type" >{{item.name}}</div>
+            <div class="order_amount reduce"><span class="unit">￥</span>0</div>
+          </div>
         </div>
         <div class="lucky_money_line" @click="popupVisible = true">
           <div class="lucky_money_line_text">红包</div>
           <div class="lucky_money_line_amount reduce isLink">
-            <div v-if="luckyMoney.title" class="luckyMoneyText">{{luckyMoney.title}}</div>
             <div class="unit">-￥</div>
             <div>{{luckyMoney.reduce}}</div>
           </div>
@@ -32,6 +37,9 @@
         </div>
       </div>
       <div class="order_confirm_other">
+        <div class="lucky_money_line" style="border-top: 0;">
+          <div class="order_confirm_other_select">在线支付</div>
+        </div>
         <div class="lucky_money_line total_line" @click="order_other = true">
           <div class="order_confirm_other_select other_Link">口味偏好/餐具份数</div>
         </div>
@@ -51,22 +59,23 @@
       <mt-header style="fontSize: 20px;z-index: 9999" title="选择红包">
         <div slot="left" class="backBtn" @click="popupVisible = false"></div>
       </mt-header>
-      <div class="no_luckyMoney no_select" :class="{isSelect: (luckyIndex === -1)}" @click="chooseLukyMoney('', -1)">
-        不使用红包
+      <div class="no_luckyMoney" @click="chooseLukyMoney('', -1)">
+        <div>不使用红包</div>
+        <div class="no_select" :class="{isSelect: (luckyIndex === -1)}" style="height: 100%;width: 40%"></div>
       </div>
       <div class="luckyMoney_count">
-        <div style="color: #757575">有<span style="color: #fe6251">{{luckyMoneyList.length}}</span>个红包可用</div>
+        <div style="color: #757575">有&nbsp;&nbsp;<span style="color: #fe6251;">{{luckyMoneyList.length}}</span>&nbsp;&nbsp;个红包可用</div>
         <div class="luckyMoney_count_detail">红包说明</div>
       </div>
-      <div v-for="(item, key) in luckyMoneyList" class="luckyMoney_list luckyMoney_main no_select" :class="{isSelect: (key === luckyIndex)}" @click="chooseLukyMoney(item, key)">
+      <div v-for="(item, key) in luckyMoneyList" class="luckyMoney_list luckyMoney_main" @click="chooseLukyMoney(item, key)">
         <div class="order_name" style="width: 30%;text-align: center;color: #ff0034;font-size: 25px;display: flex;flex-direction: column;justify-content: center;align-items: center;">
           <div><span class="unit">￥</span>{{item.reduce}}</div>
           <div class="luckyMoney_name">{{item.name}}</div>
         </div>
-        <div class="order_acount" style="width: 60%;text-align: left;padding-left: 15px;">
+        <div class="order_acount no_select" :class="{isSelect: (key === luckyIndex)}" style="width: 70%;text-align: left;padding-left: 15px;">
           <div style="color: #333333;font-weight: bold;">{{item.title}}</div>
-          <div style="color: #666666;font-size: 12px;padding-top: 5px;">{{item.times}}</div></div>
-        <div class="order_amount"></div>
+          <div style="color: #666666;font-size: 12px;padding-top: 5px;">{{item.times}}</div>
+        </div>
       </div>
     </mt-popup>
     <mt-popup
@@ -99,19 +108,12 @@
       <div class="customer_number">
         <div class="taste_title">餐具份数</div>
         <div class="customer_number_content">
-          <div class="taste_tags_button" :class="{taste_tags_button_selected: (mark.number === 0)}" @click="mark.number = 0">无特殊要求</div>
-          <div class="taste_tags_button no_padding" style="display: flex;flex: 1 0 auto;margin-left: 15px;">
-            <span class="taste_tags_children_button2" :class="{taste_tags_button_selected: (mark.number === 1)}" @click="mark.number === 1 ? (mark.number = 0) : (mark.number = 1)">1</span>
-            <span class="divide_line"></span>
-            <span class="taste_tags_children_button2" :class="{taste_tags_button_selected: (mark.number === 2)}" @click="mark.number === 2 ? (mark.number = 0) : (mark.number = 2)">2</span>
-            <span class="divide_line"></span>
-            <span class="taste_tags_children_button2" :class="{taste_tags_button_selected: (mark.number === 3)}" @click="mark.number === 3 ? (mark.number = 0) : (mark.number = 3)">3</span>
-            <span class="divide_line"></span>
-            <span class="taste_tags_children_button2" :class="{taste_tags_button_selected: (mark.number === 4)}" @click="mark.number === 4 ? (mark.number = 0) : (mark.number = 4)">4</span>
-            <span class="divide_line"></span>
-            <span class="taste_tags_children_button2" :class="{taste_tags_button_selected: (mark.number === 5)}" @click="mark.number === 5 ? (mark.number = 0) : (mark.number = 5)">5</span>
-            <span class="divide_line"></span>
-            <span class="taste_tags_children_button2" :class="{taste_tags_button_selected: (mark.number === 6)}" @click="mark.number === 6 ? (mark.number = 0) : (mark.number = 6)">6</span>
+          <div class="taste_tags_button2" :class="{taste_tags_button_selected: (mark.number === 0)}" @click="mark.number = 0">无特殊要求</div>
+          <div class="taste_tags_button2 no_padding" style="width: 200px; margin-left: 15px;overflow-x: auto;text-overflow: ellipsis; white-space: nowrap;position: absolute;">
+            <div class="taste_tags_children_button2" v-for="(item, key) in [1,2,3,4,5,6,7,8,9,10]" :class="{taste_tags_button_selected: (mark.number === item)}" @click="mark.number === item ? (mark.number = 0) : (mark.number = item)">
+              <span>{{item}}</span>
+              <span class="divide_line" style=" position: absolute;right: -1px;top: 5px;" v-if="key !== 9"></span>
+            </div>
           </div>
         </div>
       </div>
@@ -131,6 +133,12 @@ export default {
     if (this.orderInfo.order) {
       this.list = this.orderInfo.order
       this.discount = this.orderInfo.discount
+      this.otherSalesList = []
+      this.shopInfo.salesList.forEach((val) => {
+        if (val.type === 2 || val.type === 4) {
+          this.otherSalesList.push(val)
+        }
+      })
       this.$http.post('/coupon/get.html', {data: this.userInfo}).then((data) => {
         var result = data.data
         if (parseInt(result.errcode) !== 0) {
@@ -166,6 +174,7 @@ export default {
     return {
       popupVisible: false,
       order_other: false,
+      otherSalesList: [],
       list: [],
       luckyMoneyList: [],
       discount: {},
@@ -292,31 +301,35 @@ export default {
   }
   .title {
     display: flex;
-    justify-content: space-around;
-    padding: 10px 0;
+    justify-content: center;
+    padding: 10px 15px;
   }
   .title_line {
-    width: 20%;
+    width: 100%;
     height: 5px;
     padding-bottom: 5px;
     border-top: 2px solid #eeeeee;
     border-bottom: 1px solid #eeeeee;
     align-self: flex-end;
-    margin: 0 10px;
   }
   .title_text {
     color: #333333;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: bold;
+    flex: 0 0 auto;
+    padding: 0 15px;
   }
   .order_line {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px dashed #eeeeee;
-    height: 40px;
-    margin: 0 21px;
+    margin: 0 15px;
     color: #333333;
+    padding: 10px 0;
+  }
+  .discount_line {
+    padding-bottom: 10px;
   }
   .order_name {
     font-size: 15px;
@@ -347,13 +360,13 @@ export default {
   .reduce_icon {
     background: url("../assets/reduce.png") no-repeat;
     background-position: left;
-    background-size: contain;
-    padding-left: 25px;
+    background-size: 16px 16px;
+    padding-left: 20px;
   }
   .lucky_money_line {
     margin-top: 2px;
-    margin-left: 21px;
-    margin-right: 21px;
+    margin-left: 15px;
+    margin-right: 15px;
     border-top: 1px solid #eeeeee;
     border-bottom: 1px solid #eeeeee;
     display: flex;
@@ -363,6 +376,7 @@ export default {
   }
   .lucky_money_line_text {
     font-size: 15px;
+    font-weight: bold;
   }
   .lucky_money_line_amount {
     font-size: 14px;
@@ -404,7 +418,7 @@ export default {
     border-radius: 8px;
     font-size: 15px;
     margin: 10px 8px;
-    height: 40px;
+    height: 48px;
     background: #ffffff;
     display: flex;
     padding: 0 15px;
@@ -436,6 +450,7 @@ export default {
     height: 92px;
     border: 1px solid #dddddd;
     border-radius: 8px;
+    padding: 0 15px;
   }
   .luckyMoneyText {
     height: 120%;
@@ -498,12 +513,10 @@ export default {
   .no_select {
     background: #ffffff url('../assets/packet_radio_grey@3x.png') no-repeat right;
     background-size: 24px 24px;
-    background-position-x: 98%;
   }
   .isSelect {
     background: #ffffff url('../assets/packet_radio@3x.png') no-repeat right;
     background-size: 24px 24px;
-    background-position-x: 98%;
   }
   .mark_input {
     width: 70%;
@@ -516,7 +529,7 @@ export default {
     background-repeat: no-repeat;
   }
   .icon_2 {
-    background-image: url("../assets/fan@2x.png");
+    background-image: url("../assets/zeng.png");
     background-repeat: no-repeat;
   }
   .icon_3 {
@@ -529,13 +542,13 @@ export default {
   }
   .taste_content {
     background: #ffffff;
-    padding: 15px;
+    padding: 0 15px 15px 15px;
     position: relative;
   }
   .taste_title {
     color: #333333;
     font-weight: bold;
-    padding: 10px 0;
+    padding: 14px 0;
     font-size: 15px;
   }
   .taste_tags {
@@ -551,6 +564,15 @@ export default {
     justify-content: center;
     align-items: center;
     margin-bottom: 10px;
+    margin-right: 10px;
+  }
+  .taste_tags_button2 {
+    padding: 5px 10px;
+    border: 1px solid #F2F2F2;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    display: inline-block;
   }
   .no_padding {
     padding: 0;
@@ -560,6 +582,8 @@ export default {
     padding: 5px 10px;
     flex: 1 0 auto;
     text-align: center;
+    display: inline-block;
+    position: relative;
   }
   .taste_tags_button_selected {
     color: #ffffff;
@@ -568,11 +592,13 @@ export default {
   .divide_line {
     border-left: 1px solid #F2F2F2;
     height: 16px;
+
   }
   .divide_space {
-    width: 20px;
+    width: 0;
   }
   .taste_marks {
+    -webkit-appearance: none;
     width: 100%;
     border: 1px solid #F2F2F2;
     border-radius: 4px;
@@ -586,13 +612,11 @@ export default {
   }
   .customer_number {
     background: #ffffff;
-    padding: 15px;
+    padding: 0 15px 15px 15px;
     margin-top: 15px;
   }
   .customer_number_content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    position: relative;
   }
   .other_confirm {
     margin-top: 15px;

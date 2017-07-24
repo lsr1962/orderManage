@@ -37,7 +37,7 @@
             </div>
             <div class="menu_item_right">
               <div class="menu_item_right_title">{{item.name}}</div>
-              <div class="menu_item_right_tags">{{item.tags}}</div>
+              <div v-if="item.tags" class="menu_item_right_tags">{{item.tags}}</div>
               <div class="menu_item_right_line">
                 <div class="menu_item_right_line_left"><span style="font-size: 11px;">￥</span>{{item.price}}</div>
                 <div class="menu_item_right_line_right">
@@ -78,7 +78,17 @@
       v-model="chooseItem"
       class="chooseItem"
       >
-      <img style="width: 100%" :src="largeItem">
+      <img style="width: 100%" :src="largeItem.img || defaultImg">
+      <div class="menu_item_right" style="padding: 10px;width: 100%">
+        <div class="menu_item_right_title">{{largeItem.name}}</div>
+        <div v-if="largeItem.tags" class="menu_item_right_tags" style="margin-top: 10px;">{{largeItem.tags}}</div>
+        <div class="menu_item_right_line" style="padding-top: 10px;">
+          <div class="menu_item_right_line_left"><span style="font-size: 11px;">￥</span>{{largeItem.price}}</div>
+          <div class="menu_item_right_line_right">
+            <div class="modal_add_item" @click="modifyCount('add', largeItem)">加入购物车</div>
+          </div>
+        </div>
+      </div>
     </mt-popup>
     <mt-popup
       v-model="popupVisible"
@@ -117,12 +127,12 @@ import { Popup, Badge, PaletteButton, Toast } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
-    /* this.setUserInfo({
+    this.setUserInfo({
       wid: '21',
       shopid: '2',
       qrGID: 'UFI=-UA==-U1EJ',
       openid: 'ow5uyv8rECDpJ26hTlfH1gQqbwr8'
-    }) */
+    })
     if (this.userInfo.wid) {
       this.getMainInfo()
     } else {
@@ -191,7 +201,7 @@ export default {
       pullDown: false,
       popupVisible: false,
       chooseItem: false,
-      largeItem: '',
+      largeItem: {},
       chosenKind: 0,
       totalCount: 0,
       totalAmount: 0,
@@ -280,6 +290,9 @@ export default {
           }
         })
       }
+      if (this.chooseItem) {
+        this.chooseItem = false
+      }
     },
     getCurrentMenuList (newVal) {
       var tmpMenuList = []
@@ -303,7 +316,7 @@ export default {
     },
     displayItem (item) {
       this.chooseItem = true
-      this.largeItem = item.img || this.defaultImg
+      this.largeItem = item
     },
     getCode () {
       this.$http.post('/token/appid.html', {
@@ -485,8 +498,8 @@ export default {
     background-image: url("../assets/reduce.png");
     background-repeat: no-repeat;
     background-position: left;
-    background-size: contain;
-    padding-left: 25px;
+    background-size: 13px 13px;
+    padding-left: 18px;
     margin-left: 20px;
     color: #666666;
     overflow: hidden;
@@ -499,7 +512,7 @@ export default {
     background-repeat: no-repeat;
   }
   .icon_2 {
-    background-image: url("../assets/fan@2x.png");
+    background-image: url("../assets/zeng.png");
     background-repeat: no-repeat;
   }
   .icon_3 {
@@ -758,8 +771,11 @@ export default {
   }
   .menu_item_right_tags {
     font-size: 10px;
-    color: #666666;
+    color: #FF745E;
     text-align: left;
+    border: 1px solid #FFBDB3;
+    align-self: flex-start;
+    padding: 2px;
   }
   .menu_item_right_line {
     display: flex;
@@ -883,5 +899,11 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+  }
+  .modal_add_item {
+    background: #34A1FB;
+    color: #ffffff;
+    border-radius: 15px;
+    padding: 5px;
   }
 </style>

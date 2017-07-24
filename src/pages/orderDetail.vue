@@ -240,8 +240,8 @@ export default {
   .reduce_icon {
     background: url("../assets/reduce.png") no-repeat;
     background-position: left;
-    background-size: contain;
-    padding-left: 25px;
+    background-size: 13px 13px;
+    padding-left: 18px;
   }
   .lucky_money_line {
     margin-top: 2px;
@@ -320,7 +320,7 @@ export default {
     background-repeat: no-repeat;
   }
   .icon_2 {
-    background-image: url("../assets/fan@2x.png");
+    background-image: url("../assets/zeng.png");
     background-repeat: no-repeat;
   }
   .icon_3 {

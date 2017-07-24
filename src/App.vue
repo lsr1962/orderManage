@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <mt-header ref="header" style="fontSize: 20px; display: none;" :title="$route.meta.title" v-show="!($route.meta.home)">
+    <mt-header ref="header" style="fontSize: 20px; display: none;" :title="$route.meta.title" v-show="!($route.meta.home) && $route.name">
       <div slot="left" class="backBtn" @click="goBack"></div>
       <div v-if="$route.meta.right" slot="right" @click="triggerRight">{{$route.meta.right}}</div>
     </mt-header>
