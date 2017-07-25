@@ -127,12 +127,12 @@ import { Popup, Badge, PaletteButton, Toast } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
-    this.setUserInfo({
+    /* this.setUserInfo({
       wid: '21',
       shopid: '2',
       qrGID: 'UFI=-UA==-U1EJ',
       openid: 'ow5uyv8rECDpJ26hTlfH1gQqbwr8'
-    })
+    }) */
     if (this.userInfo.wid) {
       this.getMainInfo()
     } else {
