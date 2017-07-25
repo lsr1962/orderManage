@@ -5,13 +5,14 @@
         <div v-for="(item, key) in list" class="order_list_item">
           <img class="order_list_item_icon" :src="item.shopInfo.logo || defaultImg" />
           <div class="order_list_item_content" @click="gotoDetail(item)">
-            <div class="order_list_item_content_name">
-              <div class="order_list_item_content_name_text" @click.stop="gotoMain">{{item.shopInfo.name}}</div>
+            <div class="order_list_item_content_name" @click.stop="gotoMain">
+              <div class="order_list_item_content_name_text">{{item.shopInfo.name}}</div>
+              <img class="order_list_item_content_name_icon" src="../assets/business_a@2x.png"/>
               <div class="order_list_item_content_name_finish">{{item.orderList.PayName}}</div>
             </div>
             <div class="order_list_item_content_time">{{item.orderList.PayTime}}</div>
             <div class="order_list_item_content_detail">{{item.items[0].name}}&nbsp;&nbsp;等{{item.items.length}}个菜品</div>
-            <div class="order_list_item_content_amount">{{item.orderList.TradeAmount}}</div>
+            <div class="order_list_item_content_amount">￥{{item.orderList.TradeAmount}}</div>
           </div>
         </div>
       </ul>
@@ -143,19 +144,25 @@ export default {
     padding-right: 20px;
   }
   .order_list_item_content_name_text {
+    flex: 0 0 auto;
     font-size: 16px;
     color: #333333;
     font-weight: bold;
-    background: url("../assets/business_a@2x.png") no-repeat;
-    background-position: right;
-    background-size: contain;
-    padding-right: 20px;
+    padding-right: 10px;
+  }
+  .order_list_item_content_name_icon {
+    flex: 0 0 auto;
+    height: 21px;
+  }
+  .order_list_item_content_name_finish {
+    flex: 1;
+    text-align: right;
   }
   .order_list_item_content_name_pay {
     color: #2395ff;
   }
   .order_list_item_content_time {
-    padding-top: 9px;
+    padding-top: 10px;
     font-size: 12px;
     color: #999999;
   }
@@ -165,7 +172,7 @@ export default {
     color: #666666;
   }
   .order_list_item_content_amount {
-    padding-top: 9px;
+    padding-top: 10px;
     font-size: 13px;
     color: #333333;
   }

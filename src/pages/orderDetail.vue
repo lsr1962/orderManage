@@ -12,6 +12,7 @@
     <div class="detail_content">
       <div class="detail_content_order">
         <div class="order_line" style="border-bottom: 1px solid #eeeeee;" @click.stop="gotoMain">
+          <img :src="orderItem.shopInfo.logo || defaultImg" style="width: 15%;"/>
           <div class="order_list_item_content_name_text">{{orderItem.shopInfo.name}}</div>
         </div>
         <div v-for="item in orderItem.items" class="order_line">
@@ -25,11 +26,9 @@
           <div class="order_amount reduce"><span class="unit">-￥</span>{{orderItem.discount.reduce}}</div>
         </div>
         <div class="lucky_money_line" v-if="!Array.isArray(orderItem.coupon)">
-          <div class="order_name">红包</div>
+          <div class="order_name" style="font-weight: bold;">红包</div>
           <div class="order_acount"></div>
           <div class="order_amount reduce is_lucky_money">
-            <div v-if="orderItem.coupon.title" class="luckyMoneyText">{{orderItem.coupon.title}}</div>
-            <div v-else></div>
             <div class="unit">-￥</div>
             <div>{{orderItem.coupon.reduce}}</div>
           </div>
@@ -37,14 +36,14 @@
         <div class="lucky_money_line total_line">
           <div class="discount_detail discount_icon"></div>
           <div class="order_acount"></div>
-          <div class="order_amount total_amount"><span class="unit2">小计￥</span><span class="total_amount">{{orderItem.orderList.TradeAmount}}</span></div>
+          <div class="order_amount total_amount is_lucky_money"><span class="unit2">小计￥</span><span class="total_amount">{{orderItem.orderList.TradeAmount}}</span></div>
         </div>
       </div>
       <div class="detail_content_order">
         <div class="order_info_title">订单信息</div>
         <div class="order_info_line">
           <div class="order_info_line_title">订单号</div>
-          <div class="order_info_line_text">{{orderItem.orderList.OrderId}}</div>
+          <div class="order_info_line_text">{{orderItem.orderList.OrderNo}}</div>
         </div>
         <div class="order_info_line">
           <div class="order_info_line_title">支付方式</div>
@@ -179,14 +178,14 @@ export default {
   .finish_tips3 {
     font-weight: bold;
     font-size: 18px;
-    padding-top: 15px;
+    padding-top: 18px;
   }
   .finish_luckyMoney {
     background: url("../assets/packet_icon@2x.png") no-repeat left;
     background-size: 16px 16px;
     background-position-x: 5%;
     font-size: 10px;
-    margin-top: 24px;
+    margin-top: 18px;
     margin-bottom: 12px;
     padding: 5px;
     padding-left: 25px;
@@ -207,9 +206,9 @@ export default {
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px dashed #eeeeee;
-    height: 40px;
-    margin: 0 21px;
+    margin: 0 15px;
     color: #333333;
+    padding: 10px 0;
   }
   .order_name {
     font-size: 15px;
@@ -240,13 +239,13 @@ export default {
   .reduce_icon {
     background: url("../assets/reduce.png") no-repeat;
     background-position: left;
-    background-size: 13px 13px;
-    padding-left: 18px;
+    background-size: 16px 16px;
+    padding-left: 20px;
   }
   .lucky_money_line {
     margin-top: 2px;
-    margin-left: 21px;
-    margin-right: 21px;
+    margin-left: 15px;
+    margin-right: 15px;
     border-top: 1px solid #eeeeee;
     border-bottom: 1px solid #eeeeee;
     display: flex;
@@ -284,7 +283,7 @@ export default {
   }
   .order_info_title {
     padding: 10px 0;
-    margin: 0 21px;
+    margin: 0 15px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -293,7 +292,7 @@ export default {
     height: 40px;
   }
   .order_info_line {
-    margin: 0 21px;
+    margin: 0 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;

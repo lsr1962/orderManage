@@ -168,12 +168,12 @@ export default {
   .finish_tips3 {
     font-weight: bold;
     font-size: 18px;
-    padding-top: 15px;
+    padding-top: 18px;
   }
   .finish_buttons {
     display: flex;
     align-items: center;
-    margin-top: 20px;
+    margin-top: 18px;
     margin-bottom: 24px;
   }
   .finish_button {

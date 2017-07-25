@@ -243,12 +243,10 @@ export default {
   .no_select {
     background: #ffffff url('../assets/packet_radio_grey@3x.png') no-repeat right;
     background-size: 24px 24px;
-    background-position-x: 98%;
   }
   .isSelect {
     background: #ffffff url('../assets/packet_radio@3x.png') no-repeat right;
     background-size: 24px 24px;
-    background-position-x: 98%;
   }
   .shopMain_list_bottom_line2 {
     height: 48px;
