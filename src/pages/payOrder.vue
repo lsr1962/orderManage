@@ -15,17 +15,18 @@
         选择支付方式
       </div>
       <div class="pay_method_list">
-        <div class="pay_method_list_item no_select" v-for="(item, key) in pay_method_list" :key="item.name" v-if="(key !== 0 && pullDown) || (key === 0)"
-             :class="{isSelect: (key === payIndex)}" @click="choosePayMethod(item, key)">
+        <div class="pay_method_list_item" v-for="(item, key) in pay_method_list" :key="item.name" v-if="(key !== 0 && pullDown) || (key === 0)"
+              @click="choosePayMethod(item, key)">
           <img class="pay_method_list_item_icon" :src="item.img"/>
           <div class="pay_method_list_item_text">{{item.name}}</div>
+          <div class="pay_method_list_item_right no_select" :class="{isSelect: (key === payIndex)}"></div>
         </div>
         <div class="pay_method_more" v-if="!pullDown" >
           <div class="pay_method_more_text" @click="pullDown = true">查看更多支付方式</div>
         </div>
       </div>
     </div>
-    <div class="shopMain_list_bottom_line2" @click="pay">
+    <div class="shopMain_list_bottom_line2" ref="pay_display_whole" @click="pay">
       <div class="shopMain_list_bottom_pay" ref="pay_display">确认支付<span class="unit">￥</span>{{orderInfo.orderList ? orderInfo.orderList.TradeAmount : ''}}</div>
     </div>
   </div>
@@ -45,6 +46,7 @@ export default {
         if (this.remain_time === '00:00') {
           this.$refs.pay_display.innerHTML = '重新下单'
           this.$refs.pay_display.style.background = '#595959'
+          this.$refs.pay_display_whole.style.background = '#595959'
           this.$refs.remain_time.innerHTML = '订单已关闭'
           window.clearInterval(this.timer)
         }
@@ -190,9 +192,9 @@ export default {
   }
   .pay_order_name_amount {
     color: #ff5339;
+    font-size: 16px;
   }
   .unit {
-    padding: 0 10px;
   }
   .choose_method {
     padding: 10px 16px;
@@ -203,18 +205,24 @@ export default {
   }
   .pay_method_list_item {
     display: flex;
-    justify-content: flex-start;
-    padding: 10px 16px;
+    padding: 10px 15px;
     height: 53px;
     border-bottom: 1px solid #eeeeee;
+    background: #ffffff;
   }
   .pay_method_list_item_icon {
-    padding: 0 20px;
+    flex: 0 0 auto;
+    padding-left: 7px;
+    padding-right: 22px;
   }
   .pay_method_list_item_text {
+    flex: 1;
     font-size: 15px;
     color: #333333;
     align-self: center;
+  }
+  .pay_method_list_item_right {
+    flex: 1;
   }
   .pay_method_more {
     height: 40px;
@@ -255,7 +263,7 @@ export default {
     z-index: 1999;
   }
   .shopMain_list_bottom_pay {
-    font-size: 17px;
+    font-size: 16px;
     padding: 0 15px;
     display: flex;
     justify-content: center;
