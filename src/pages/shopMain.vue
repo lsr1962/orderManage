@@ -81,8 +81,8 @@
       <img style="width: 100%" :src="largeItem.img || defaultImg">
       <div class="menu_item_right" style="padding: 10px;width: 100%">
         <div class="menu_item_right_title">{{largeItem.name}}</div>
-        <div v-if="largeItem.tags" class="menu_item_right_tags" style="margin-top: 10px;">{{largeItem.tags}}</div>
-        <div class="menu_item_right_line" style="padding-top: 10px;">
+        <div v-if="largeItem.tags" class="menu_item_right_tags" style="margin-top: 5px;">{{largeItem.tags}}</div>
+        <div class="menu_item_right_line" style="padding-top: 5px;">
           <div class="menu_item_right_line_left"><span style="font-size: 11px;">￥</span>{{largeItem.price}}</div>
           <div class="menu_item_right_line_right">
             <div class="modal_add_item" @click="modifyCount('add', largeItem)">加入购物车</div>
@@ -127,12 +127,12 @@ import { Popup, Badge, PaletteButton, Toast } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
-    /* this.setUserInfo({
+    this.setUserInfo({
       wid: '21',
       shopid: '2',
       qrGID: 'UFI=-UA==-U1EJ',
       openid: 'ow5uyv8rECDpJ26hTlfH1gQqbwr8'
-    }) */
+    })
     if (this.userInfo.wid) {
       this.getMainInfo()
     } else {
@@ -448,7 +448,6 @@ export default {
     background: -webkit-linear-gradient(45deg, #A87C33  0%, #AA906E  30%, #A87C33 60%, #AA906E  100%) !important;
     background: linear-gradient(45deg, #A87C33 0%, #AA906E  30%, #A87C33 60%, #AA906E  100%) !important;
     background-size: cover;
-    padding-top: 20px;
   }
   .shopMain_top_icon {
     width: 60px;
@@ -469,13 +468,14 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    background: url("../assets/more.png") no-repeat;
+    background-position: right;
+    background-size: 25px 25px;
   }
   .shopMain_top_info_name {
     font-size: 18px;
     font-weight: bold;
-    background: url("../assets/more.png") no-repeat;
-    background-position: right;
-    background-size: contain;
+
     margin-bottom: 7px;
   }
   .shopMain_top_info_intro {
@@ -775,7 +775,9 @@ export default {
     text-align: left;
     border: 1px solid #FFBDB3;
     align-self: flex-start;
-    padding: 2px;
+    padding: 0 1px;
+    display: flex;
+    align-items: flex-start;
   }
   .menu_item_right_line {
     display: flex;
@@ -904,6 +906,6 @@ export default {
     background: #34A1FB;
     color: #ffffff;
     border-radius: 15px;
-    padding: 5px;
+    padding: 5px 10px;
   }
 </style>

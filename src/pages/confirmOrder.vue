@@ -108,9 +108,9 @@
       <div class="customer_number">
         <div class="taste_title">餐具份数</div>
         <div class="customer_number_content">
-          <div class="taste_tags_button2" :class="{taste_tags_button_selected: (mark.number === 0)}" @click="mark.number = 0">无特殊要求</div>
-          <div class="taste_tags_button2 no_padding" style="width: 200px; margin-left: 15px;overflow-x: auto;text-overflow: ellipsis; white-space: nowrap;position: absolute;">
-            <div class="taste_tags_children_button2" v-for="(item, key) in [1,2,3,4,5,6,7,8,9,10]" :class="{taste_tags_button_selected: (mark.number === item)}" @click="mark.number === item ? (mark.number = 0) : (mark.number = item)">
+          <div class="taste_tags_button2" style="flex: 0 0 auto" :class="{taste_tags_button_selected: (mark.number === 0)}" @click="mark.number = 0">无特殊要求</div>
+          <div class="taste_tags_button2 no_padding" style="margin-left: 15px;overflow-x: auto;text-overflow: ellipsis; white-space: nowrap;">
+            <div class="taste_tags_children_button2" style="padding: 5px 12px;" v-for="(item, key) in [1,2,3,4,5,6,7,8,9,10]" :class="{taste_tags_button_selected: (mark.number === item)}" @click="mark.number === item ? (mark.number = 0) : (mark.number = item)">
               <span>{{item}}</span>
               <span class="divide_line" style=" position: absolute;right: -1px;top: 5px;" v-if="key !== 9"></span>
             </div>
@@ -571,8 +571,6 @@ export default {
     border: 1px solid #F2F2F2;
     border-radius: 4px;
     margin-bottom: 10px;
-    margin-right: 10px;
-    display: inline-block;
   }
   .no_padding {
     padding: 0;
@@ -616,6 +614,7 @@ export default {
     margin-top: 15px;
   }
   .customer_number_content {
+    display: flex;
     position: relative;
   }
   .other_confirm {

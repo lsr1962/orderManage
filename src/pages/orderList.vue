@@ -2,19 +2,19 @@
   <div class="order_list" ref="order_list">
     <mt-loadmore :autoFill="false" :bottom-method="loadBottom" @bottom-status-change="handleBottomChange" :bottom-all-loaded="allLoaded" ref="loadmore">
       <ul>
-        <div v-for="(item, key) in list" class="order_list_item">
+        <li v-for="(item, key) in list" class="order_list_item">
           <img class="order_list_item_icon" :src="item.shopInfo.logo || defaultImg" />
           <div class="order_list_item_content" @click="gotoDetail(item)">
             <div class="order_list_item_content_name" @click.stop="gotoMain">
               <div class="order_list_item_content_name_text">{{item.shopInfo.name}}</div>
-              <img class="order_list_item_content_name_icon" src="../assets/business_a@2x.png"/>
+              <img class="order_list_item_content_name_icon" src="../assets/store@2x.png"/>
               <div class="order_list_item_content_name_finish">{{item.orderList.PayName}}</div>
             </div>
             <div class="order_list_item_content_time">{{item.orderList.PayTime}}</div>
             <div class="order_list_item_content_detail">{{item.items[0].name}}&nbsp;&nbsp;等{{item.items.length}}个菜品</div>
             <div class="order_list_item_content_amount">￥{{item.orderList.TradeAmount}}</div>
           </div>
-        </div>
+        </li>
       </ul>
       <div slot="bottom" class="mint-loadmore-bottom">
         <span v-show="bottomStatus !== 'loading'" :class="{ 'is-rotate': bottomStatus === 'drop' }">↑</span>
@@ -39,7 +39,6 @@ export default {
       this.$router.push({name: 'shopMain', query: this.$route.query})
     }
     this.$refs.order_list.style.height = (document.documentElement.clientHeight - this.$refs.order_list.getBoundingClientRect().top) + 'px'
-    this.$refs.order_list.style.overflow = 'auto'
   },
   components: {
     [Loadmore.name]: Loadmore,
@@ -118,6 +117,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   .order_list {
+    overflow: scroll;
   }
   .order_list_item {
     display: flex;
@@ -152,7 +152,7 @@ export default {
   }
   .order_list_item_content_name_icon {
     flex: 0 0 auto;
-    height: 21px;
+    height: 16px;
   }
   .order_list_item_content_name_finish {
     flex: 1;
