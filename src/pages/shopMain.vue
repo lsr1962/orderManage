@@ -1,6 +1,6 @@
 <template>
   <div class="shopMain">
-    <div class="shopMain_top">
+    <div class="shopMain_top" :style="{'background': 'url(' + shopInfo.bgpic + ')', 'background-size': 'cover'}" @click="$router.push({name: 'shopInfo', query: $route.query})">
       <div class="shopMain_top_icon">
         <img class="shopMain_top_icon_img" :src="shopInfo.logo">
       </div>
@@ -352,6 +352,12 @@ export default {
           logo: result.shopInfo.logo,
           notice: result.shopInfo.notice,
           tags: result.shopInfo.tags,
+          bgpic: result.shopInfo.bgpic,
+          phone: result.shopInfo.phone,
+          address: result.shopInfo.address,
+          times: result.shopInfo.times,
+          info: result.shopInfo.info,
+          pics: result.shopInfo.pics,
           salesList: result.salesList
         })
         this.kindList = result.menuList
@@ -444,9 +450,6 @@ export default {
     justify-content: center;
     color: #FFFFFF;
     text-align: left;
-    background: -moz-linear-gradient(45deg, #A87C33  0%, #AA906E  30%, #A87C33 60%, #AA906E  100%) !important;
-    background: -webkit-linear-gradient(45deg, #A87C33  0%, #AA906E  30%, #A87C33 60%, #AA906E  100%) !important;
-    background: linear-gradient(45deg, #A87C33 0%, #AA906E  30%, #A87C33 60%, #AA906E  100%) !important;
     background-size: cover;
   }
   .shopMain_top_icon {

@@ -8,6 +8,7 @@ const payOrder = r => require.ensure([], () => r(require('../pages/payOrder.vue'
 const payFinish = r => require.ensure([], () => r(require('../pages/payFinish.vue')), 'payFinish')
 const orderList = r => require.ensure([], () => r(require('../pages/orderList.vue')), 'orderList')
 const orderDetail = r => require.ensure([], () => r(require('../pages/orderDetail.vue')), 'orderDetail')
+const shopInfo = r => require.ensure([], () => r(require('../pages/shopInfo.vue')), 'shopInfo')
 
 export default new Router({
   mode: 'hash',
@@ -60,6 +61,14 @@ export default new Router({
       component: orderDetail,
       meta: {
         title: '订单详情'
+      }
+    },
+    {
+      path: '/shopInfo',
+      name: 'shopInfo',
+      component: shopInfo,
+      meta: {
+        title: '店铺主页'
       }
     }
   ]
