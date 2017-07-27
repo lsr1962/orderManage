@@ -9,25 +9,37 @@
     </div>
     <div class="shop_info_main">
       <div class="shop_info_main_line" style="border: 0;font-weight: bold;font-size: 18px;">
+        商家简介
+      </div>
+      <div class="shop_info_main_line_pics">
+        {{shopInfo.info}}
+      </div>
+    </div>
+    <div class="shop_info_main">
+      <div class="shop_info_main_line" style="border: 0;font-weight: bold;font-size: 18px;">
+        活动与服务
+      </div>
+      <div class="shopMain_sales_line" v-for="(item, key) in shopInfo.salesList" :key="item.id" :style="{'padding-bottom': (key === (shopInfo.salesList.length - 1) ? '10px' : '3px')}">
+        <div class="shopMain_sales_line_detail" :class="'icon_' + item.type" >{{item.name}}</div>
+      </div>
+    </div>
+    <div class="shop_info_main">
+      <div class="shop_info_main_line" style="border: 0;font-weight: bold;font-size: 18px;">
         商家信息
       </div>
       <div class="shop_info_main_line">
         <div class="shop_info_main_line_left">商家电话</div>
-        <div class="shop_info_main_line_right">{{shopInfo.phone}}</div>
+        <div class="shop_info_main_line_right"><a :href="'tel:' + shopInfo.phone" class="dial_phone_number">{{shopInfo.phone}}</a></div>
       </div>
       <div class="shop_info_main_line">
         <div class="shop_info_main_line_left">商家地址</div>
         <div class="shop_info_main_line_right">{{shopInfo.address}}</div>
       </div>
       <div class="shop_info_main_line">
-        <div class="shop_info_main_line_left">商家简介</div>
-        <div class="shop_info_main_line_right">{{shopInfo.info}}</div>
-      </div>
-      <div class="shop_info_main_line">
         <div class="shop_info_main_line_left">商家营业时间</div>
         <div class="shop_info_main_line_right">{{shopInfo.times}}</div>
       </div>
-      <div class="shop_info_main_line">
+      <div class="shop_info_main_line_pics">
         <div class="shop_info_main_line_left">商家图集</div>
         <div class="shop_info_main_line_right"></div>
       </div>
@@ -101,7 +113,6 @@
     padding-top: 10px;
   }
   .shop_info_notice {
-    font-size: 15px;
     padding: 10px 0;
     margin: 10px 20px 0 20px;
     display: flex;
@@ -131,6 +142,26 @@
     font-size: 13px;
     color: #666666;
   }
+  .dial_phone_number {
+    padding-left: 20px;
+    background: url("../assets/dial.png") left no-repeat;
+    background-size: contain;
+  }
+  a:link {
+    text-decoration: none;
+    color: #F60;
+  }
+  a:visited {
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: none;
+  }
+  a:active {
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+  }
   .shop_info_main_line_pics {
     margin: 0 15px;
     padding: 10px 0;
@@ -142,5 +173,40 @@
     height: 100px;
     margin-right: 10px;
     margin-bottom: 10px;
+  }
+  .shopMain_sales_line {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    font-size: 12px;
+  }
+  .shopMain_sales_line_detail {
+    height: 16px;
+    background-image: url("../assets/reduce.png");
+    background-repeat: no-repeat;
+    background-position: left;
+    background-size: 13px 13px;
+    padding-left: 18px;
+    margin: 0 15px;
+    color: #666666;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .icon_1 {
+    background-image: url("../assets/jian@2x.png");
+    background-repeat: no-repeat;
+  }
+  .icon_2 {
+    background-image: url("../assets/zeng.png");
+    background-repeat: no-repeat;
+  }
+  .icon_3 {
+    background-image: url("../assets/xin@2x.png");
+    background-repeat: no-repeat;
+  }
+  .icon_4 {
+    background-image: url("../assets/zhuan@2x.png");
+    background-repeat: no-repeat;
   }
 </style>
