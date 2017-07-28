@@ -11,6 +11,7 @@ import axios from 'axios'
 
 Vue.config.productionTip = false
 axios.defaults.baseURL = 'http://o2o.jlxmt.cn/api/shop'
+// axios.defaults.baseURL = 'http://o2o.jlxmt.cn/api/demo'
 axios.interceptors.request.use(function (config) {
   // Do something before request is sent
   Indicator.open()
