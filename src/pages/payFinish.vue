@@ -14,6 +14,11 @@
       </div>
       <div class="finish_luckyMoney" v-if="shareList.isShare === '0'">发红包</div>
     </div>
+    <div class="qrcodeList">
+      <div class="qrcodeList_title">{{qrcodeList.title}}</div>
+      <img class="qrcodeList_img" :src="qrcodeList.qrcode"/>
+      <div class="qrcodeList_text">{{qrcodeList.text}}</div>
+    </div>
     <mt-popup
       v-model="popupVisible"
       class="luckyMoney_popup"
@@ -57,6 +62,7 @@ export default {
         this.name = result.orderList.name
         this.couponList = result.couponList
         this.shareList = result.shareList
+        this.qrcodeList = result.qrcodeList
         try {
           if (result.couponList.money > 0) {
             this.popupVisible = true
@@ -69,7 +75,6 @@ export default {
     } else {
       this.$router.push({name: 'shopMain', query: this.$route.query})
     }
-    this.$refs.finish_order.style.height = (document.documentElement.clientHeight - this.$refs.finish_order.getBoundingClientRect().top) + 'px'
   },
   components: {
     [Popup.name]: Popup
@@ -83,6 +88,7 @@ export default {
       name: '',
       couponList: {},
       shareList: {},
+      qrcodeList: {},
       query_params: {}
     }
   },
@@ -255,5 +261,23 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  .qrcodeList {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+  }
+  .qrcodeList_title {
+    padding: 15px;
+    width: 80%;
+    text-align: center;
+  }
+  .qrcodeList_img {
+    width: 60%;
+  }
+  .qrcodeList_text {
+    padding: 10px;
   }
 </style>
