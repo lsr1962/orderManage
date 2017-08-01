@@ -70,7 +70,7 @@
         </template>
         <template v-else>
           <div class="shopMain_list_bottom_noSelected">未选择商品</div>
-          <div class="shopMain_list_bottom_pay_noSelected">￥20起送</div>
+          <div class="shopMain_list_bottom_pay_noSelected">去结算</div>
         </template>
       </div>
     </div>
