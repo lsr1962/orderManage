@@ -12,7 +12,7 @@
         <div class="finish_button left" @click="$router.push({name: 'orderList', query: $route.query})">查看订单</div>
         <div class="finish_button right" @click="$router.push({name: 'shopMain', query: $route.query})">商家首页</div>
       </div>
-      <div class="finish_luckyMoney" v-if="shareList.isShare === '0'">发红包</div>
+      <div class="finish_luckyMoney" v-if="shareList.isShare === '0'" @click="shareTips = true">发红包</div>
     </div>
     <div class="qrcodeList">
       <div class="qrcodeList_title">{{qrcodeList.title}}</div>
@@ -27,6 +27,12 @@
       <div class="luckyMoney_popup_amount"><span class="unit">￥</span>{{couponList.money}}</div>
       <div class="luckyMoney_popup_tips">{{couponList.name}}</div>
       <div class="luckyMoney_popup_button" @click="popupVisible = false">好的</div>
+    </mt-popup>
+    <mt-popup
+      v-model="shareTips"
+      class="shareTips_popup"
+      popup-transition="popup-fade">
+      <div class="shareTips_text">请点击右上角分享给朋友圈</div>
     </mt-popup>
   </div>
 </template>
@@ -69,6 +75,60 @@ export default {
           }
         } catch (e) {
         }
+        if (result.shareList.isShare === '0') {
+          this.$http.post('/share/get.html', {
+            data: this.userInfo,
+            share: {
+              OrderId: this.$route.query.OrderId
+            }
+          }).then((data1) => {
+            var result1 = data1.data
+            if (parseInt(result1.errcode) !== 0) {
+              Toast(result1.errmsg)
+              return
+            }
+            window.wx.config({
+              debug: false,
+              appId: result1.configData.appId,
+              timestamp: result1.configData.timestamp,
+              nonceStr: result1.configData.nonceStr,
+              signature: result1.configData.signature,
+              jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage']
+            })
+            window.wx.ready(() => {
+              window.wx.onMenuShareTimeline({
+                title: result1.shareData.share_title, // 分享标题
+                link: result1.shareData.share_url, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                imgUrl: result1.shareData.share_pic, // 分享图标
+                success: () => {
+                  this.reportShare('1')
+                },
+                cancel: () => {
+                  // 用户取消分享后执行的回调函数
+                }
+              })
+              window.wx.onMenuShareAppMessage({
+                title: result1.shareData.share_title, // 分享标题
+                desc: result1.shareData.share_content, // 分享描述
+                link: result1.shareData.share_url, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                imgUrl: result1.shareData.share_pic, // 分享图标
+                type: '', // 分享类型,music、video或link，不填默认为link
+                dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                success: () => {
+                  this.reportShare('2')
+                },
+                cancel: () => {
+                  // 用户取消分享后执行的回调函数
+                }
+              })
+            })
+            window.wx.error((res) => {
+              Toast(res)
+            })
+          }).catch((e) => {
+            console.log(e)
+          })
+        }
       }).catch((e) => {
         console.log(e)
       })
@@ -82,6 +142,7 @@ export default {
   data () {
     return {
       popupVisible: false,
+      shareTips: false,
       finish_time: '',
       tags: '',
       text: '',
@@ -116,6 +177,26 @@ export default {
         if (new RegExp('(' + k + ')').test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)))
       }
       return fmt
+    },
+    reportShare (type) {
+      this.$http.post('/share/report.html', {
+        data: this.userInfo,
+        share: {
+          OrderId: this.$route.query.OrderId,
+          from_type: type,
+          share_type: '1'
+        }
+      }).then((data) => {
+        var result = data.data
+        if (parseInt(result.errcode) !== 0) {
+          Toast(result.errmsg)
+          return
+        } else {
+          Toast('分享成功！')
+        }
+      }).catch((e) => {
+        console.log(e)
+      })
     }
   },
   watch: {
@@ -279,5 +360,20 @@ export default {
   }
   .qrcodeList_text {
     padding: 10px;
+  }
+  .shareTips_popup {
+    top: 0;
+    width: 100%;
+  }
+  .shareTips_text {
+    position: absolute;
+    padding-top: 200px;
+    text-align: center;
+    width: 100%;
+    font-size: 20px;
+    color: #ffffff;
+    background: url("../assets/shareTips.png") no-repeat;
+    background-size: 30%;
+    background-position: top right;
   }
 </style>

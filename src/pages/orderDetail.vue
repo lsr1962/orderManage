@@ -7,7 +7,7 @@
       <div class="finish_tips">{{orderItem.orderList.tags}}</div>
       <div class="finish_tips2">{{orderItem.orderList.text}}</div>
       <div class="finish_tips3">{{orderItem.orderList.PayName}}</div>
-      <div class="finish_luckyMoney">发红包</div>
+      <div class="finish_luckyMoney" v-if="orderItem.orderList.isShare === '0'" @click="shareTips = true">发红包</div>
     </div>
     <div class="detail_content">
       <div class="detail_content_order">
@@ -55,16 +55,77 @@
         </div>
       </div>
     </div>
+    <mt-popup
+      v-model="shareTips"
+      class="shareTips_popup"
+      popup-transition="popup-fade">
+      <div class="shareTips_text" @click="shareTips = false">请点击右上角分享给朋友圈</div>
+    </mt-popup>
   </div>
 </template>
 
 <script>
+import { Popup, Toast } from 'mint-ui'
 import { mapGetters, mapActions } from 'vuex'
 export default {
   name: 'shopMain',
   mounted () {
     if (this.$route.params.item) {
       this.orderItem = this.$route.params.item
+      if (this.orderItem.orderList.isShare === '0') {
+        this.$http.post('/share/get.html', {
+          data: this.userInfo,
+          share: {
+            OrderId: this.orderItem.orderList.OrderId
+          }
+        }).then((data1) => {
+          var result1 = data1.data
+          if (parseInt(result1.errcode) !== 0) {
+            Toast(result1.errmsg)
+            return
+          }
+          window.wx.config({
+            debug: false,
+            appId: result1.configData.appId,
+            timestamp: result1.configData.timestamp,
+            nonceStr: result1.configData.nonceStr,
+            signature: result1.configData.signature,
+            jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage']
+          })
+          window.wx.ready(() => {
+            window.wx.onMenuShareTimeline({
+              title: result1.shareData.share_title, // 分享标题
+              link: result1.shareData.share_url, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+              imgUrl: result1.shareData.share_pic, // 分享图标
+              success: () => {
+                this.reportShare('1')
+              },
+              cancel: () => {
+                // 用户取消分享后执行的回调函数
+              }
+            })
+            window.wx.onMenuShareAppMessage({
+              title: result1.shareData.share_title, // 分享标题
+              desc: result1.shareData.share_content, // 分享描述
+              link: result1.shareData.share_url, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+              imgUrl: result1.shareData.share_pic, // 分享图标
+              type: '', // 分享类型,music、video或link，不填默认为link
+              dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+              success: () => {
+                this.reportShare('2')
+              },
+              cancel: () => {
+                // 用户取消分享后执行的回调函数
+              }
+            })
+          })
+          window.wx.error((res) => {
+            Toast(res)
+          })
+        }).catch((e) => {
+          console.log(e)
+        })
+      }
     } else {
       this.$router.push({name: 'shopMain', query: this.$route.query})
     }
@@ -74,10 +135,12 @@ export default {
     })
   },
   components: {
+    [Popup.name]: Popup
   },
   data () {
     return {
       defaultImg: require('../assets/default_log.png'),
+      shareTips: false,
       orderItem: {
         coupon: [],
         discount: [],
@@ -90,7 +153,8 @@ export default {
   computed: {
     ...mapGetters([
       'shopInfo',
-      'orderInfo'
+      'orderInfo',
+      'userInfo'
     ])
   },
   methods: {
@@ -123,6 +187,26 @@ export default {
     },
     gotoDetail (item) {
       console.log(item.orderId)
+    },
+    reportShare (type) {
+      this.$http.post('/share/report.html', {
+        data: this.userInfo,
+        share: {
+          OrderId: this.orderItem.orderList.OrderId,
+          from_type: type,
+          share_type: '1'
+        }
+      }).then((data) => {
+        var result = data.data
+        if (parseInt(result.errcode) !== 0) {
+          Toast(result.errmsg)
+          return
+        } else {
+          Toast('分享成功！')
+        }
+      }).catch((e) => {
+        console.log(e)
+      })
     }
   },
   watch: {
@@ -179,13 +263,13 @@ export default {
     font-weight: bold;
     font-size: 18px;
     padding-top: 18px;
+    margin-bottom: 18px;
   }
   .finish_luckyMoney {
     background: url("../assets/packet_icon@2x.png") no-repeat left;
     background-size: 16px 16px;
     background-position-x: 5%;
     font-size: 10px;
-    margin-top: 18px;
     margin-bottom: 12px;
     padding: 5px;
     padding-left: 25px;
@@ -329,5 +413,20 @@ export default {
   .icon_4 {
     background-image: url("../assets/zhuan@2x.png");
     background-repeat: no-repeat;
+  }
+  .shareTips_popup {
+    top: 0;
+    width: 100%;
+  }
+  .shareTips_text {
+    position: absolute;
+    padding-top: 200px;
+    text-align: center;
+    width: 100%;
+    font-size: 20px;
+    color: #ffffff;
+    background: url("../assets/shareTips.png") no-repeat;
+    background-size: 30%;
+    background-position: top right;
   }
 </style>
