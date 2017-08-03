@@ -6,12 +6,14 @@ import store from './store'
 import router from './router'
 import 'mint-ui/lib/style.css'
 import { Indicator } from 'mint-ui'
+import urlConfig from './url_config'
+Vue.prototype.$urlConfig = urlConfig
 
 import axios from 'axios'
 
 Vue.config.productionTip = false
-axios.defaults.baseURL = 'http://o2o.jlxmt.cn/api/shop'
-// axios.defaults.baseURL = 'http://o2o.jlxmt.cn/api/demo'
+axios.defaults.baseURL = urlConfig.release_baseURL
+// axios.defaults.baseURL = urlConfig.debug_baseURL
 axios.interceptors.request.use(function (config) {
   // Do something before request is sent
   Indicator.open()

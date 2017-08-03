@@ -139,7 +139,7 @@ export default {
           this.otherSalesList.push(val)
         }
       })
-      this.$http.post('/coupon/get.html', {data: this.userInfo}).then((data) => {
+      this.$http.post(this.$urlConfig.getCoupon, {data: this.userInfo}).then((data) => {
         var result = data.data
         if (parseInt(result.errcode) !== 0) {
           Toast(result.errmsg)
@@ -248,7 +248,7 @@ export default {
         }
       })
       tags = tags.join(',')
-      this.$http.post('/order/create.html', {
+      this.$http.post(this.$urlConfig.createOrder, {
         data: this.userInfo,
         items: this.orderInfo.order,
         discount: this.orderInfo.discount,

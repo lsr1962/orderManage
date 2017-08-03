@@ -73,7 +73,7 @@ export default {
     if (this.$route.params.item) {
       this.orderItem = this.$route.params.item
       if (this.orderItem.orderList.isShare === '0') {
-        this.$http.post('/share/get.html', {
+        this.$http.post(this.$urlConfig.getShare, {
           data: this.userInfo,
           share: {
             OrderId: this.orderItem.orderList.OrderId
@@ -189,7 +189,7 @@ export default {
       console.log(item.orderId)
     },
     reportShare (type) {
-      this.$http.post('/share/report.html', {
+      this.$http.post(this.$urlConfig.reportShare, {
         data: this.userInfo,
         share: {
           OrderId: this.orderItem.orderList.OrderId,

@@ -88,7 +88,7 @@ export default {
       this.bottomStatus = status
     },
     loadBottom () {
-      this.$http.post('/order/get.html', {
+      this.$http.post(this.$urlConfig.getOrder, {
         data: this.userInfo,
         order: this.order
       }).then((data) => {

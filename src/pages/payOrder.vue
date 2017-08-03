@@ -126,7 +126,7 @@ export default {
       if (this.remain_time === '00:00') {
         this.$router.push({name: 'shopMain', query: this.$route.query})
       } else {
-        this.$http.post('/order/doPay.html', {
+        this.$http.post(this.$urlConfig.doPay, {
           data: this.userInfo,
           order: {
             OrderId: this.orderInfo.orderList.OrderId,

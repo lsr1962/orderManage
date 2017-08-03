@@ -51,7 +51,7 @@ export default {
         qrGID: this.$route.query.qrGID,
         openid: this.$route.query.openid
       })
-      this.$http.post('/notify/payFinish.html', {
+      this.$http.post(this.$urlConfig.payFinish, {
         data: this.userInfo,
         order: {
           OrderId: this.$route.query.OrderId
@@ -76,7 +76,7 @@ export default {
         } catch (e) {
         }
         if (result.shareList.isShare === '0') {
-          this.$http.post('/share/get.html', {
+          this.$http.post(this.$urlConfig.getShare, {
             data: this.userInfo,
             share: {
               OrderId: this.$route.query.OrderId
@@ -179,7 +179,7 @@ export default {
       return fmt
     },
     reportShare (type) {
-      this.$http.post('/share/report.html', {
+      this.$http.post(this.$urlConfig.reportShare, {
         data: this.userInfo,
         share: {
           OrderId: this.$route.query.OrderId,

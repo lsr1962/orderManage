@@ -127,12 +127,7 @@ import { Popup, Badge, PaletteButton, Toast } from 'mint-ui'
 export default {
   name: 'shopMain',
   mounted () {
-    /* this.setUserInfo({
-      wid: '21',
-      shopid: '2',
-      qrGID: 'UFI=-UA==-U1EJ',
-      openid: 'ow5uyv8rECDpJ26hTlfH1gQqbwr8'
-    }) */
+    // this.setUserInfo(this.$urlConfig.default_userInfo)
     if (this.userInfo.wid) {
       this.getMainInfo()
     } else {
@@ -150,7 +145,7 @@ export default {
           isSaved = false
         }
         if (!isSaved) {
-          this.$http.post('/token/openid.html', {
+          this.$http.post(this.$urlConfig.openId, {
             data: {
               wid: this.$route.query.wid,
               shopid: this.$route.query.shopid,
@@ -319,7 +314,7 @@ export default {
       this.largeItem = item
     },
     getCode () {
-      this.$http.post('/token/appid.html', {
+      this.$http.post(this.$urlConfig.appId, {
         data: {
           wid: this.$route.query.wid,
           shopid: this.$route.query.shopid,
@@ -341,7 +336,7 @@ export default {
       })
     },
     getMainInfo () {
-      this.$http.post('/main/get.html', {data: this.userInfo}).then((data) => {
+      this.$http.post(this.$urlConfig.getMain, {data: this.userInfo}).then((data) => {
         var result = data.data
         if (parseInt(result.errcode) !== 0) {
           Toast(result.errmsg)
