@@ -7,7 +7,7 @@
       <div class="finish_tips">{{orderItem.orderList.tags}}</div>
       <div class="finish_tips2">{{orderItem.orderList.text}}</div>
       <div class="finish_tips3">{{orderItem.orderList.PayName}}</div>
-      <div class="finish_luckyMoney" v-if="orderItem.orderList.isShare === '0'" @click="shareTips = true">发红包</div>
+      <div class="finish_luckyMoney" v-if="orderItem.orderList.isShare === 0" @click="shareTips = true">发红包</div>
     </div>
     <div class="detail_content">
       <div class="detail_content_order">
@@ -72,7 +72,7 @@ export default {
   mounted () {
     if (this.$route.params.item) {
       this.orderItem = this.$route.params.item
-      if (this.orderItem.orderList.isShare === '0') {
+      if (this.orderItem.orderList.isShare === 0) {
         this.$http.post(this.$urlConfig.getShare, {
           data: this.userInfo,
           share: {

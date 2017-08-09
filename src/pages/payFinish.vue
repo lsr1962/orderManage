@@ -12,7 +12,7 @@
         <div class="finish_button left" @click="$router.push({name: 'orderList', query: $route.query})">查看订单</div>
         <div class="finish_button right" @click="$router.push({name: 'shopMain', query: $route.query})">商家首页</div>
       </div>
-      <div class="finish_luckyMoney" v-if="shareList.isShare === '0'" @click="shareTips = true">发红包</div>
+      <div class="finish_luckyMoney" v-if="shareList.isShare === 0" @click="shareTips = true">发红包</div>
     </div>
     <div class="qrcodeList">
       <div class="qrcodeList_title">{{qrcodeList.title}}</div>
@@ -75,7 +75,7 @@ export default {
           }
         } catch (e) {
         }
-        if (result.shareList.isShare === '0') {
+        if (result.shareList.isShare === 0) {
           this.$http.post(this.$urlConfig.getShare, {
             data: this.userInfo,
             share: {

@@ -169,7 +169,7 @@
     flex-wrap: wrap;
   }
   .shop_info_pics {
-    width: 100px;
+    width: 30%;
     height: 100px;
     margin-right: 10px;
     margin-bottom: 10px;

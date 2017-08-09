@@ -462,7 +462,7 @@ export default {
   .shopMain_top_info {
     font-size: 11px;
     width: 70%;
-    padding: 10px 0 10px 15px;
+    padding: 10px 10px 10px 15px;
     display: flex;
     flex-direction: column;
     justify-content: center;
