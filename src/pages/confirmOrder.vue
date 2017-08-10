@@ -26,8 +26,14 @@
         <div class="lucky_money_line" @click="popupVisible = true">
           <div class="lucky_money_line_text">红包</div>
           <div class="lucky_money_line_amount reduce isLink">
-            <div class="unit">-￥</div>
-            <div>{{luckyMoney.reduce}}</div>
+            <template v-if="luckyIndex === -1">
+              <div v-if="luckyMoneyList.length === 0" class="noReadyCount">无可用优惠券</div>
+              <div v-else class="hasReadyCount">{{luckyMoneyList.length}}个可用</div>
+            </template>
+            <template v-else>
+              <div class="unit">-￥</div>
+              <div>{{luckyMoney.reduce}}</div>
+            </template>
           </div>
         </div>
         <div class="lucky_money_line total_line">
@@ -415,7 +421,6 @@ export default {
   }
   .no_luckyMoney {
     border: 1px solid #dddddd;
-    border-radius: 8px;
     font-size: 15px;
     margin: 10px 8px;
     height: 48px;
@@ -449,7 +454,6 @@ export default {
     align-items: center;
     height: 92px;
     border: 1px solid #dddddd;
-    border-radius: 8px;
     padding: 0 15px;
   }
   .luckyMoneyText {
@@ -631,5 +635,16 @@ export default {
     width: 90%;
     font-size: 15px;
     height: 40px;
+  }
+  .noReadyCount {
+    color: #c4c4c4;
+    font-size: 12px;
+  }
+  .hasReadyCount {
+    background: #ff5339;
+    color: #ffffff;
+    font-size: 12px;
+    border-radius: 2px;
+    padding: 0 2px;
   }
 </style>

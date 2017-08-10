@@ -1,83 +1,86 @@
 <template>
-  <div class="shopMain">
-    <div class="shopMain_top" :style="{'background': 'url(' + shopInfo.bgpic + ')', 'background-size': 'cover'}" @click="$router.push({name: 'shopInfo', query: $route.query})">
-      <div class="shopMain_top_icon">
-        <img class="shopMain_top_icon_img" :src="shopInfo.logo">
-      </div>
-      <div class="shopMain_top_info">
-        <div class="shopMain_top_info_name">{{shopInfo.name}}</div>
-        <div class="shopMain_top_info_intro">{{shopInfo.notice}}</div>
-        <div class="shopMain_top_info_tips"><span style="background: #0091ff;padding: 0 2px;border-radius: 3px;">{{shopInfo.tags}}</span></div>
-      </div>
-    </div>
-    <div class="shopMain_sales" @click="toggleType">
-      <div class="shopMain_sales_line" v-for="(item, key) in shopInfo.salesList" :key="item.id" v-if="(key !== 0 && pullDown) || (key === 0)">
-        <div class="shopMain_sales_line_detail" :class="'icon_' + item.type" >{{item.name}}</div>
-        <div :class="button_type" v-if="key === 0" >{{shopInfo.salesList.length}}个活动</div>
-      </div>
-    </div>
-    <div class="shopMain_list">
-      <div class="shopMain_list_title_line">
-        <div class="shopMain_list_title">商品</div>
-        <div class="shopMain_list_order" @click="$router.push({name: 'orderList', query: $route.query})">查看订单</div>
-      </div>
-      <div class="shopMain_list_total" ref="list_frame">
-        <div class="shopMain_list_total_kind">
-          <div v-for="(item, key) in kindList" :key="item.type" :class="'kind_item ' + (key === chosenKind ? 'chosen' : '')" @click="chosenKind = key">
-            {{item.name}}
-            <div class="kind_item_line" v-if="(key !== chosenKind) && ((key + 1) !== chosenKind)"></div>
-            <mt-badge class="kind_item_badge" color="red" v-if="item.count > 0" size="small">{{item.count > 99 ? '99+' : item.count}}</mt-badge>
-          </div>
+  <div class="shopMain" >
+    <div ref="shopMain">
+      <div class="shopMain_top" :style="{'background': 'url(' + shopInfo.bgpic + ')', 'background-size': 'cover'}" @click="$router.push({name: 'shopInfo', query: $route.query})">
+        <div class="shopMain_top_icon">
+          <img class="shopMain_top_icon_img" :src="shopInfo.logo">
         </div>
-        <div class="shopMain_list_total_menu">
-          <div class="shopMain_list_total_menu_title">{{kindList[chosenKind].name}}</div>
-          <div v-for="(item, key) in menuList" :key="item.id" class="menu_item">
-            <div class="menu_item_left" @click="displayItem(item)">
-              <img class="menu_item_left_img" :src="item.img || defaultImg"/>
+        <div class="shopMain_top_info">
+          <div class="shopMain_top_info_name">{{shopInfo.name}}</div>
+          <div class="shopMain_top_info_intro">{{shopInfo.notice}}</div>
+          <div class="shopMain_top_info_tips"><span style="background: #0091ff;padding: 0 2px;border-radius: 3px;">{{shopInfo.tags}}</span></div>
+        </div>
+      </div>
+      <div class="shopMain_sales" @click="toggleType">
+        <div class="shopMain_sales_line" v-for="(item, key) in shopInfo.salesList" :key="item.id" v-if="(key !== 0 && pullDown) || (key === 0)">
+          <div class="shopMain_sales_line_detail" :class="'icon_' + item.type" >{{item.name}}</div>
+          <div :class="button_type" v-if="key === 0" >{{shopInfo.salesList.length}}个活动</div>
+        </div>
+      </div>
+      <div class="shopMain_list">
+        <div class="shopMain_list_title_line">
+          <div class="shopMain_list_title">商品</div>
+          <div class="shopMain_list_order" @click="$router.push({name: 'orderList', query: $route.query})">查看订单</div>
+        </div>
+        <div class="shopMain_list_total" ref="list_frame">
+          <div class="shopMain_list_total_kind">
+            <div v-for="(item, key) in kindList" :key="item.type" :class="'kind_item ' + (key === chosenKind ? 'chosen' : '')" @click="chosenKind = key">
+              {{item.name}}
+              <div class="kind_item_line" v-if="(key !== chosenKind) && ((key + 1) !== chosenKind)"></div>
+              <mt-badge class="kind_item_badge" color="red" v-if="item.count > 0" size="small">{{item.count > 99 ? '99+' : item.count}}</mt-badge>
             </div>
-            <div class="menu_item_right">
-              <div class="menu_item_right_title">{{item.name}}</div>
-              <div v-if="item.tags" class="menu_item_right_tags">{{item.tags}}</div>
-              <div class="menu_item_right_line">
-                <div class="menu_item_right_line_left"><span style="font-size: 11px;">￥</span>{{item.price}}</div>
-                <div class="menu_item_right_line_right">
-                  <div v-if="item.count > 0" class="menu_item_right_line_right_button_del"  @click="modifyCount('del', item)"></div>
-                  <div v-if="item.count > 0" class="menu_item_right_line_right_count">{{item.count}}</div>
-                  <div class="menu_item_right_line_right_button" @click="modifyCount('add', item)"></div>
+          </div>
+          <div class="shopMain_list_total_menu">
+            <div class="shopMain_list_total_menu_title">{{kindList[chosenKind].name}}</div>
+            <div v-for="(item, key) in menuList" :key="item.id" class="menu_item">
+              <div class="menu_item_left" @click="displayItem(item)">
+                <img class="menu_item_left_img" :src="item.img || defaultImg"/>
+              </div>
+              <div class="menu_item_right">
+                <div class="menu_item_right_title">{{item.name}}</div>
+                <div v-if="item.tags" class="menu_item_right_tags">{{item.tags}}</div>
+                <div class="menu_item_right_line">
+                  <div class="menu_item_right_line_left"><span style="font-size: 11px;">￥</span>{{item.price}}</div>
+                  <div class="menu_item_right_line_right">
+                    <div v-if="item.count > 0" class="menu_item_right_line_right_button_del"  @click="modifyCount('del', item)"></div>
+                    <div v-if="item.count > 0" class="menu_item_right_line_right_count">{{item.count}}</div>
+                    <div class="menu_item_right_line_right_button" @click="modifyCount('add', item)"></div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="shopMain_list_bottom_line1" v-if="salesTips">
-        <template v-if="salesType === 3">
-          新用户首单立减<span style="color: #ff5339">{{salesTips2}}</span>元
-        </template>
-        <template v-else>
-          已满{{salesTips}}元，结算减<span style="color: #ff5339">{{salesTips2}}</span>元
-        </template>
-      </div>
-      <div class="shopMain_list_bottom_line2" :style="{background: shopMain_list_bottom_line2_background}">
-        <div class="shopMain_list_bottom_icon" @click="selected_menu.length > 0 ? (popupVisible = !popupVisible) : ''">
+        <div class="shopMain_list_bottom_line1" v-if="salesTips">
+          <template v-if="salesType === 3">
+            新用户首单立减<span style="color: #ff5339">{{salesTips2}}</span>元
+          </template>
+          <template v-else>
+            已满{{salesTips}}元，结算减<span style="color: #ff5339">{{salesTips2}}</span>元
+          </template>
+        </div>
+        <div class="shopMain_list_bottom_line2" ref="bottom_line" :style="{background: shopMain_list_bottom_line2_background}">
+          <div class="shopMain_list_bottom_icon" @click="selected_menu.length > 0 ? (popupVisible = !popupVisible) : ''">
           <span :class="(selected_menu.length > 0 ? 'kind_item_badge_img' : 'kind_item_badge_img_noSelect')">
             <mt-badge class="kind_item_badge" style="top: -10px; right: -10px;" color="red" v-if="totalCount > 0" size="small">{{totalCount > 99 ? '99+' : totalCount}}</mt-badge>
           </span>
+          </div>
+          <template v-if="totalAmount > 0">
+            <div class="shopMain_list_bottom_amount">￥{{totalAmount}}</div>
+            <div class="shopMain_list_bottom_pay" @click="pay">去结算</div>
+          </template>
+          <template v-else>
+            <div class="shopMain_list_bottom_noSelected">未选择商品</div>
+            <div class="shopMain_list_bottom_pay_noSelected">去结算</div>
+          </template>
         </div>
-        <template v-if="totalAmount > 0">
-          <div class="shopMain_list_bottom_amount">￥{{totalAmount}}</div>
-          <div class="shopMain_list_bottom_pay" @click="pay">去结算</div>
-        </template>
-        <template v-else>
-          <div class="shopMain_list_bottom_noSelected">未选择商品</div>
-          <div class="shopMain_list_bottom_pay_noSelected">去结算</div>
-        </template>
       </div>
     </div>
     <mt-popup
       v-model="chooseItem"
       class="chooseItem"
       >
+      <img style="position: absolute;top:2px;right:2px;width: 30px;height:30px;" src="../assets/close.png" @click="chooseItem = false"/>
       <img style="width: 100%" :src="largeItem.img || defaultImg">
       <div class="menu_item_right" style="padding: 10px;width: 100%">
         <div class="menu_item_right_title">{{largeItem.name}}</div>
@@ -85,6 +88,7 @@
         <div class="menu_item_right_line" style="padding-top: 5px;">
           <div class="menu_item_right_line_left"><span style="font-size: 11px;">￥</span>{{largeItem.price}}</div>
           <div class="menu_item_right_line_right">
+            <div class="modal_add_item modal_tour_item" @click="chooseItem = false">再看看</div>
             <div class="modal_add_item" @click="modifyCount('add', largeItem)">加入购物车</div>
           </div>
         </div>
@@ -432,6 +436,13 @@ export default {
     },
     chosenKind (newVal) {
       this.getCurrentMenuList(newVal)
+    },
+    chooseItem (newVal) {
+      var filterValue = 'blur(0px)'
+      if (newVal) {
+        filterValue = 'blur(4px)'
+      }
+      this.$refs.shopMain.style['-webkit-filter'] = filterValue
     }
   }
 }
@@ -894,7 +905,7 @@ export default {
     height: 15px;
   }
   .chooseItem {
-    width: 90%;
+    width: 80%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -903,7 +914,14 @@ export default {
   .modal_add_item {
     background: #34A1FB;
     color: #ffffff;
-    border-radius: 15px;
+    border-radius: 0 15px 15px 0;
     padding: 5px 10px;
+  }
+  .modal_tour_item {
+    background: #ffffff;
+    color: #333333;
+    border-radius: 15px 0 0 15px;
+    border: 1px solid #F0F0F0;
+    border-right: 0;
   }
 </style>
